@@ -1,99 +1,103 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Brasileirão Série A</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#1a1f45">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{background:#1a1f45;font-family:system-ui}
-    .container{max-width:1200px;margin:0 auto;padding:20px}
-    .card{background:white;border-radius:16px;padding:20px;margin-top:20px;overflow-x:auto}
-    .logo{width:60px;height:60px;border-radius:12px}
-    h1{color:white;font-size:1.8rem;margin:20px 0}
-    .loading{text-align:center;color:white;padding:40px}
-    .error{background:#d32f2f;color:white;padding:15px;border-radius:8px;text-align:center}
-    table{width:100%;border-collapse:collapse}
-    th{background:#1a1f45;color:white;padding:12px 8px}
-    td{padding:10px 8px;text-align:center;border-bottom:1px solid #eee}
-    .team-name{text-align:left;display:flex;align-items:center;gap:10px}
-    .team-crest{width:24px}
-    .position{font-weight:bold}
-    .btn-back{background:rgba(255,255,255,0.2);color:white;padding:10px 20px;border-radius:50px;border:none;cursor:pointer}
-    .update-time{color:rgba(255,255,255,0.6);font-size:12px;margin-top:10px;text-align:center}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brasileirão Série A</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a1f45">
+
+<link rel="icon" href="icon-192.png">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1f45;font-family:system-ui}
+.container{max-width:1200px;margin:auto;padding:20px}
+.card{background:white;border-radius:16px;padding:20px;margin-top:20px}
+h1{color:white;margin:20px 0}
+.loading{text-align:center;color:white;padding:40px}
+.error{background:#d32f2f;color:white;padding:15px;border-radius:8px;text-align:center}
+table{width:100%;border-collapse:collapse}
+th{background:#1a1f45;color:white;padding:10px}
+td{padding:8px;text-align:center;border-bottom:1px solid #eee}
+.team-name{text-align:left;display:flex;gap:10px;align-items:center}
+.team-crest{width:24px}
+.btn{background:#1a1f45;color:white;padding:10px 20px;border:none;border-radius:30px;cursor:pointer}
+</style>
 </head>
+
 <body>
+
 <div class="container">
-  <div style="display:flex;justify-content:space-between;align-items:center">
-    <img src="icon-192.png" class="logo">
-    <button class="btn-back" id="homeBtn">← Início</button>
-  </div>
-  <h1>🏆 Brasileirão Série A 2026</h1>
+  <h1>🏆 Brasileirão Série A</h1>
   <div id="content"><div class="loading">Carregando...</div></div>
 </div>
+
 <script>
 const API_TOKEN = '097a10c756d8414bab6f4d152de93b41';
 const API_URL = 'https://api.football-data.org/v4/competitions/BSA/standings';
 
+// 🔥 PROXY (ESSENCIAL)
+const PROXY = 'https://api.allorigins.win/raw?url=';
+
 async function loadStandings() {
   document.getElementById('content').innerHTML = '<div class="loading">📊 Buscando dados...</div>';
+
   try {
-    const response = await fetch(API_URL, {
-  headers: { 'X-Auth-Token': API_TOKEN }
-});
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const response = await fetch(PROXY + encodeURIComponent(API_URL), {
+      headers: { 'X-Auth-Token': API_TOKEN }
+    });
+
+    if (!response.ok) throw new Error("Falha na API");
+
     const data = await response.json();
-    if (!data.standings) throw new Error('Dados inválidos');
-    displayStandings(data);
-  } catch (error) {
+
+    display(data);
+
+  } catch (e) {
     document.getElementById('content').innerHTML = `
-      <div class="card"><div class="error">❌ Erro: ${error.message}<br><br>
-      <button class="btn-back" onclick="loadStandings()" style="background:#1a1f45;">Tentar novamente</button>
-      </div></div>`;
+      <div class="card">
+        <div class="error">
+          ❌ Erro ao carregar dados<br><br>
+          <button class="btn" onclick="loadStandings()">Tentar novamente</button>
+        </div>
+      </div>`;
   }
 }
 
-function displayStandings(data) {
-  const standings = data.standings[0].table;
-  let html = `<div class="card"><h3>${data.competition.name} - 2026</h3>
-  <table><thead><tr><th>#</th><th>Time</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th><th>PTS</th></tr></thead><tbody>`;
-  standings.forEach(t => {
-    html += `<tr><td class="position">${t.position}</td>
-    <td class="team-name">${t.team.crest ? `<img src="${t.team.crest}" class="team-crest" onerror="this.style.display='none'">` : ''}${t.team.name}</td>
-    <td>${t.playedGames}</td><td>${t.won}</td><td>${t.draw}</td><td>${t.lost}</td>
-    <td>${t.goalsFor}</td><td>${t.goalsAgainst}</td>
-    <td><strong>${t.goalDifference > 0 ? '+' : ''}${t.goalDifference}</strong></td>
-    <td><strong>${t.points}</strong></td></tr>`;
+function display(data) {
+  const tabela = data.standings[0].table;
+
+  let html = `<div class="card">
+  <h3>${data.competition.name}</h3>
+  <table>
+  <tr><th>#</th><th>Time</th><th>Pts</th></tr>`;
+
+  tabela.forEach(t => {
+    html += `
+    <tr>
+      <td>${t.position}</td>
+      <td class="team-name">
+        <img src="${t.team.crest}" class="team-crest" onerror="this.style.display='none'">
+        ${t.team.name}
+      </td>
+      <td><strong>${t.points}</strong></td>
+    </tr>`;
   });
-  html += `</tbody></table>
-  <div class="update-time">🕐 ${new Date().toLocaleString('pt-BR')}<br>Fonte: Football-Data.org</div>
-  <button class="btn-back" onclick="loadStandings()" style="margin-top:20px;background:#1a1f45;color:white;">🔄 Atualizar</button>
-  </div>`;
+
+  html += `</table></div>`;
+
   document.getElementById('content').innerHTML = html;
 }
 
-document.getElementById('homeBtn').onclick = () => {
-  document.getElementById('content').innerHTML = `<div class="card" style="text-align:center;">
-    <h2 style="color:#1a1f45;">Brasileirão Série A</h2>
-    <p style="color:#666;margin:20px 0;">Classificações, jogos e resultados</p>
-    <button class="btn-back" id="verBtn" style="background:#1a1f45;color:white;padding:14px 32px;">Ver Classificações →</button>
-  </div>`;
-  document.getElementById('verBtn').onclick = () => loadStandings();
-};
-
 loadStandings();
 
+// PWA
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');
 }
 </script>
+
 </body>
 </html>
