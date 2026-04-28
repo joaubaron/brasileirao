@@ -25,65 +25,256 @@
       background: #1a1f45;
       font-family: 'Roboto', sans-serif;
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
     }
 
     .card {
-      text-align: center;
-      padding: 2rem;
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 20px;
+      overflow-x: auto;
     }
 
     .logo {
-      width: 120px;
-      height: 120px;
-      margin-bottom: 2rem;
-      border-radius: 24px;
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
     }
 
     h1 {
       color: white;
       font-size: 1.8rem;
-      margin-bottom: 0.5rem;
+      margin: 20px 0;
     }
 
-    p {
-      color: rgba(255,255,255,0.7);
-      margin-bottom: 2rem;
+    .loading {
+      text-align: center;
+      color: white;
+      padding: 40px;
+      font-size: 1.2rem;
     }
 
-    .btn {
-      display: inline-block;
-      background: #ffffff;
-      color: #1a1f45;
-      text-decoration: none;
-      padding: 14px 32px;
-      border-radius: 50px;
+    .error {
+      background: #ff4444;
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th {
+      background: #1a1f45;
+      color: white;
+      padding: 12px 8px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    td {
+      padding: 10px 8px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+    }
+
+    .team-name {
+      text-align: left;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .team-crest {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+    }
+
+    tr:hover {
+      background: #f5f5f5;
+    }
+
+    .position {
       font-weight: bold;
-      font-size: 1rem;
-      transition: transform 0.2s;
+      color: #1a1f45;
     }
 
-    .btn:active {
-      transform: scale(0.96);
+    .btn-back {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 50px;
+      margin-bottom: 20px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-back:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .update-time {
+      color: rgba(255,255,255,0.6);
+      font-size: 12px;
+      margin-top: 10px;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <img src="icon-192.png" alt="Brasileirão" class="logo">
-    <h1>Brasileirão Série A</h1>
-    <p>Classificações, jogos e resultados</p>
-    <a href="#" class="btn" id="verBtn">Ver Classificações →</a>
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <img src="icon-192.png" alt="Brasileirão" class="logo">
+      <button class="btn-back" id="homeBtn">← Início</button>
+    </div>
+    
+    <h1>🏆 Brasileirão Série A 2026</h1>
+    
+    <div id="content">
+      <div class="loading">Carregando classificação...</div>
+    </div>
   </div>
 
   <script>
-    const googleUrl = "https://www.espn.com.br/futebol/classificacao";
+    // SUA API TOKEN
+    const API_TOKEN = '097a10c756d8414bab6f4d152de93b41';
+    const API_URL = 'https://api.football-data.org/v4/competitions/BSA/standings';
+
+    // Tela inicial
+    function showHome() {
+      document.getElementById('content').innerHTML = `
+        <div class="card" style="text-align: center;">
+          <h2 style="color: #1a1f45; margin-bottom: 20px;">Brasileirão Série A</h2>
+          <p style="color: #666; margin-bottom: 30px;">Classificações, jogos e resultados</p>
+          <button class="btn-back" id="verBtn" style="background: #1a1f45; color: white; padding: 14px 32px; font-size: 1rem;">Ver Classificações →</button>
+        </div>
+      `;
+      document.getElementById('verBtn')?.addEventListener('click', () => loadStandings());
+    }
+
+    // Buscar classificação da API
+    async function loadStandings() {
+      document.getElementById('content').innerHTML = '<div class="loading">📊 Buscando dados da API Football-Data.org...</div>';
+      
+      try {
+        const response = await fetch(API_URL, {
+          headers: { 'X-Auth-Token': API_TOKEN }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        displayStandings(data);
+        
+      } catch (error) {
+        document.getElementById('content').innerHTML = `
+          <div class="card">
+            <div class="error">
+              ❌ Erro ao carregar dados<br>
+              <small>${error.message}</small><br><br>
+              <button class="btn-back" onclick="loadStandings()" style="background: #1a1f45;">Tentar novamente</button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Exibir tabela
+    function displayStandings(data) {
+      const standings = data.standings?.[0]?.table;
+      
+      if (!standings || standings.length === 0) {
+        document.getElementById('content').innerHTML = `
+          <div class="card">
+            <div class="error">⚠️ Nenhum dado de classificação disponível no momento</div>
+          </div>
+        `;
+        return;
+      }
+
+      const competition = data.competition?.name || 'Campeonato Brasileiro';
+      const season = data.season?.startDate?.split('-')[0] || '2026';
+      const updatedAt = new Date().toLocaleString('pt-BR');
+
+      let html = `
+        <div class="card">
+          <h3 style="margin-bottom: 10px;">${competition} - ${season}</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>Time</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th><th>PTS</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      standings.forEach(team => {
+        const teamName = team.team.name;
+        const position = team.position;
+        const playedGames = team.playedGames;
+        const won = team.won;
+        const draw = team.draw;
+        const lost = team.lost;
+        const goalsFor = team.goalsFor;
+        const goalsAgainst = team.goalsAgainst;
+        const goalDifference = team.goalDifference;
+        const points = team.points;
+
+        html += `
+          <tr>
+            <td class="position">${position}</td>
+            <td class="team-name">
+              ${team.team.crest ? `<img src="${team.team.crest}" class="team-crest" alt="${teamName}" onerror="this.style.display='none'">` : ''}
+              ${teamName}
+            </td>
+            <td>${playedGames}</td>
+            <td>${won}</td>
+            <td>${draw}</td>
+            <td>${lost}</td>
+            <td>${goalsFor}</td>
+            <td>${goalsAgainst}</td>
+            <td><strong>${goalDifference > 0 ? '+' : ''}${goalDifference}</strong></td>
+            <td><strong>${points}</strong></td>
+          </tr>
+        `;
+      });
+
+      html += `
+            </tbody>
+          </table>
+          <div class="update-time">
+            🕐 Última atualização: ${updatedAt}<br>
+            Fonte: Football-Data.org
+          </div>
+          <button class="btn-back" onclick="loadStandings()" style="margin-top: 20px; background: #1a1f45; color: white;">🔄 Atualizar</button>
+        </div>
+      `;
+
+      document.getElementById('content').innerHTML = html;
+    }
+
+    // Navegação
+    document.getElementById('homeBtn').addEventListener('click', showHome);
     
-    document.getElementById('verBtn').addEventListener('click', function(e) {
-      window.location.href = googleUrl;
-    });
+    // Carregar classificação direto (opcional: mude para showHome() se quiser a tela inicial)
+    loadStandings();
 
     // Service worker
     if ('serviceWorker' in navigator) {
