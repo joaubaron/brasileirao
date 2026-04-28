@@ -4,8 +4,8 @@
   "description": "Classificações do Brasileirão",
   "start_url": "index.html",
   "display": "standalone",
-  "theme_color": "#1a73e8",
-  "background_color": "#ffffff",
+  "theme_color": "#1a1f45",
+  "background_color": "#1a1f45",
   "icons": [
     {
       "src": "icon-192.png",
