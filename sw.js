@@ -1,11 +1,10 @@
-const CACHE_VERSION = '28.04.2026-1555';
+const CACHE_VERSION = '28.04.2026-1543';
 const CACHE_NAME = `brasileirao-${CACHE_VERSION}`;
 const ASSETS = [
-  '/brasileirao/',
-  '/brasileirao/index.html',
-  '/brasileirao/manifest.json',
-  '/brasileirao/icon-192.png',
-  '/brasileirao/icon-512.png'
+  '/index.html',
+  '/manifest.json',
+  '/icon-192.png',
+  '/icon-512.png'
 ];
 
 self.addEventListener('install', e => {
