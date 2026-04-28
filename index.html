@@ -63,9 +63,23 @@
       font-weight: bold;
       font-size: 1rem;
       transition: transform 0.2s;
+      cursor: pointer;
     }
 
     .btn:active {
+      transform: scale(0.96);
+    }
+
+    .fluminense-logo {
+      width: 80px;
+      height: 80px;
+      margin-top: 2rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+      border-radius: 12px;
+    }
+
+    .fluminense-logo:active {
       transform: scale(0.96);
     }
   </style>
@@ -76,13 +90,20 @@
     <h1>Classificação 2026</h1>
     <p>Campeonatos, jogos e resultados</p>
     <a href="#" class="btn" id="verBtn">Ver Classificação ⚽</a>
+    
+    <img src="fluminense.png" alt="Fluminense" class="fluminense-logo" id="fluminenseBtn">
   </div>
 
   <script>
     const googleUrl = "https://www.espn.com.br/futebol/classificacao";
+    const fluminenseUrl = "https://www.espn.com.br/futebol/time/_/id/3445/fluminense";
     
     document.getElementById('verBtn').addEventListener('click', function(e) {
       window.location.href = googleUrl;
+    });
+
+    document.getElementById('fluminenseBtn').addEventListener('click', function(e) {
+      window.location.href = fluminenseUrl;
     });
 
     // Service worker
