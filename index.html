@@ -134,6 +134,21 @@
       margin-top: 10px;
       text-align: center;
     }
+
+    .cors-warning {
+      background: #ff9800;
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .cors-warning a {
+      color: white;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -153,6 +168,9 @@
   <script>
     // SUA API TOKEN
     const API_TOKEN = '097a10c756d8414bab6f4d152de93b41';
+    
+    // Usando proxy CORS público
+    const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
     const API_URL = 'https://api.football-data.org/v4/competitions/BSA/standings';
 
     // Tela inicial
@@ -167,16 +185,22 @@
       document.getElementById('verBtn')?.addEventListener('click', () => loadStandings());
     }
 
-    // Buscar classificação da API
+    // Buscar classificação da API via proxy
     async function loadStandings() {
       document.getElementById('content').innerHTML = '<div class="loading">📊 Buscando dados da API Football-Data.org...</div>';
       
       try {
-        const response = await fetch(API_URL, {
-          headers: { 'X-Auth-Token': API_TOKEN }
+        const response = await fetch(PROXY_URL + API_URL, {
+          headers: { 
+            'X-Auth-Token': API_TOKEN,
+            'Origin': window.location.origin
+          }
         });
 
         if (!response.ok) {
+          if (response.status === 403) {
+            throw new Error('Ative o acesso temporário clicando no link que aparecerá abaixo');
+          }
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
@@ -184,15 +208,31 @@
         displayStandings(data);
         
       } catch (error) {
-        document.getElementById('content').innerHTML = `
+        let errorHtml = `
           <div class="card">
             <div class="error">
               ❌ Erro ao carregar dados<br>
-              <small>${error.message}</small><br><br>
+              <small>${error.message}</small><br>
+        `;
+        
+        if (error.message.includes('Ative')) {
+          errorHtml += `
+            <br>
+            <div class="cors-warning">
+              🔧 <strong>Solução:</strong> Primeiro, clique <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank">AQUI</a> e depois em "Request temporary access".<br>
+              Depois volte e clique em "Tentar novamente".
+            </div>
+          `;
+        }
+        
+        errorHtml += `
+              <br>
               <button class="btn-back" onclick="loadStandings()" style="background: #1a1f45;">Tentar novamente</button>
             </div>
           </div>
         `;
+        
+        document.getElementById('content').innerHTML = errorHtml;
       }
     }
 
@@ -273,7 +313,7 @@
     // Navegação
     document.getElementById('homeBtn').addEventListener('click', showHome);
     
-    // Carregar classificação direto (opcional: mude para showHome() se quiser a tela inicial)
+    // Carregar classificação automaticamente
     loadStandings();
 
     // Service worker
