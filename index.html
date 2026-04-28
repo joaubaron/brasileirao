@@ -170,7 +170,7 @@
     const API_TOKEN = '097a10c756d8414bab6f4d152de93b41';
     
     // Usando proxy CORS público
-   const PROXY_URL = 'https://api.allorigins.win/raw?url=';
+   const PROXY_URL = 'https://corsproxy.io/?';
    const API_URL = 'https://api.football-data.org/v4/competitions/BSA/standings';
 
     // Tela inicial
@@ -186,13 +186,13 @@
     }
 
     // Buscar classificação da API via proxy
-   async function loadStandings() {
+  async function loadStandings() {
   document.getElementById('content').innerHTML = '<div class="loading">📊 Buscando dados...</div>';
   
   try {
     const response = await fetch(PROXY_URL + encodeURIComponent(API_URL), {
       headers: { 
-        'X-Auth-Token': API_TOKEN  // ← SÓ ISSO, sem o Origin
+        'X-Auth-Token': API_TOKEN
       }
     });
 
