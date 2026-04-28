@@ -2,10 +2,12 @@
   "name": "Brasileirão Série A",
   "short_name": "Brasileirão",
   "description": "Classificações do Brasileirão",
-  "start_url": "index.html",
+  "start_url": "/brasileirao/index.html",
+  "scope": "/brasileirao/",
   "display": "standalone",
   "theme_color": "#1a1f45",
   "background_color": "#1a1f45",
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "icon-192.png",
