@@ -1,103 +1,94 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brasileirão Série A</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brasileirão Série A</title>
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1a1f45">
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a1f45">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Brasileirão">
+  
+  <!-- Ícones -->
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-<link rel="icon" href="icon-192.png">
+    body {
+      background: #1a1f45;
+      font-family: 'Roboto', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1f45;font-family:system-ui}
-.container{max-width:1200px;margin:auto;padding:20px}
-.card{background:white;border-radius:16px;padding:20px;margin-top:20px}
-h1{color:white;margin:20px 0}
-.loading{text-align:center;color:white;padding:40px}
-.error{background:#d32f2f;color:white;padding:15px;border-radius:8px;text-align:center}
-table{width:100%;border-collapse:collapse}
-th{background:#1a1f45;color:white;padding:10px}
-td{padding:8px;text-align:center;border-bottom:1px solid #eee}
-.team-name{text-align:left;display:flex;gap:10px;align-items:center}
-.team-crest{width:24px}
-.btn{background:#1a1f45;color:white;padding:10px 20px;border:none;border-radius:30px;cursor:pointer}
-</style>
+    .card {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .logo {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 2rem;
+      border-radius: 24px;
+    }
+
+    h1 {
+      color: white;
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 2rem;
+    }
+
+    .btn {
+      display: inline-block;
+      background: #ffffff;
+      color: #1a1f45;
+      text-decoration: none;
+      padding: 14px 32px;
+      border-radius: 50px;
+      font-weight: bold;
+      font-size: 1rem;
+      transition: transform 0.2s;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+  </style>
 </head>
-
 <body>
+  <div class="card">
+    <img src="icon-192.png" alt="Brasileirão" class="logo">
+    <h1>Brasileirão Série A</h1>
+    <p>Classificações, jogos e resultados</p>
+    <a href="#" class="btn" id="verBtn">Ver Classificações →</a>
+  </div>
 
-<div class="container">
-  <h1>🏆 Brasileirão Série A</h1>
-  <div id="content"><div class="loading">Carregando...</div></div>
-</div>
-
-<script>
-const API_TOKEN = '097a10c756d8414bab6f4d152de93b41';
-const API_URL = 'https://api.football-data.org/v4/competitions/BSA/standings';
-
-// 🔥 PROXY (ESSENCIAL)
-const PROXY = 'https://api.allorigins.win/raw?url=';
-
-async function loadStandings() {
-  document.getElementById('content').innerHTML = '<div class="loading">📊 Buscando dados...</div>';
-
-  try {
-    const response = await fetch(PROXY + encodeURIComponent(API_URL), {
-      headers: { 'X-Auth-Token': API_TOKEN }
+  <script>
+    const googleUrl = "https://www.espn.com.br/futebol/classificacao";
+    
+    document.getElementById('verBtn').addEventListener('click', function(e) {
+      window.location.href = googleUrl;
     });
 
-    if (!response.ok) throw new Error("Falha na API");
-
-    const data = await response.json();
-
-    display(data);
-
-  } catch (e) {
-    document.getElementById('content').innerHTML = `
-      <div class="card">
-        <div class="error">
-          ❌ Erro ao carregar dados<br><br>
-          <button class="btn" onclick="loadStandings()">Tentar novamente</button>
-        </div>
-      </div>`;
-  }
-}
-
-function display(data) {
-  const tabela = data.standings[0].table;
-
-  let html = `<div class="card">
-  <h3>${data.competition.name}</h3>
-  <table>
-  <tr><th>#</th><th>Time</th><th>Pts</th></tr>`;
-
-  tabela.forEach(t => {
-    html += `
-    <tr>
-      <td>${t.position}</td>
-      <td class="team-name">
-        <img src="${t.team.crest}" class="team-crest" onerror="this.style.display='none'">
-        ${t.team.name}
-      </td>
-      <td><strong>${t.points}</strong></td>
-    </tr>`;
-  });
-
-  html += `</table></div>`;
-
-  document.getElementById('content').innerHTML = html;
-}
-
-loadStandings();
-
-// PWA
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
-}
-</script>
-
+    // Service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
 </body>
 </html>
