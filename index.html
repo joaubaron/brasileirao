@@ -41,15 +41,14 @@
 </div>
 <script>
 const API_TOKEN = '097a10c756d8414bab6f4d152de93b41';
-const PROXY_URL = 'https://corsproxy.io/?';
 const API_URL = 'https://api.football-data.org/v4/competitions/BSA/standings';
 
 async function loadStandings() {
   document.getElementById('content').innerHTML = '<div class="loading">📊 Buscando dados...</div>';
   try {
-    const response = await fetch(PROXY_URL + encodeURIComponent(API_URL), {
-      headers: { 'X-Auth-Token': API_TOKEN }
-    });
+    const response = await fetch(API_URL, {
+  headers: { 'X-Auth-Token': API_TOKEN }
+});
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
     if (!data.standings) throw new Error('Dados inválidos');
