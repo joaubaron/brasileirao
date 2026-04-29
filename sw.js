@@ -1,13 +1,14 @@
 const CACHE_VERSION = '29.04.2026-1420';
 const CACHE_NAME = `brasileirao-${CACHE_VERSION}`;
 const ASSETS = [
-  '/brasileirao/manifest.json',
   '/brasileirao/icon-192.png',
   '/brasileirao/icon-512.png',
   '/brasileirao/brasil.png',
   '/brasileirao/bec.png',
+  '/brasileirao/fluminense/manifest.json',
   '/brasileirao/fluminense/index.html',
   '/brasileirao/fluminense/meutime.png',
+  '/brasileirao/flamengo/manifest.json',
   '/brasileirao/flamengo/index.html',
   '/brasileirao/flamengo/meutime.png'
 ];
