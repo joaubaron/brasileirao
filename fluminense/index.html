@@ -98,8 +98,8 @@ user-select: none;
 }
 
 #brasilBtn {
-width: 145px;
-height: 145px;
+width: 140px;
+height: 140px;
 }
 
 .time-logo:active {
@@ -129,24 +129,20 @@ const googleUrl = "https://www.espn.com.br/futebol/classificacao";
 const meutimeUrl = "https://www.fluminense.com.br/site/";
 
 document.getElementById('verBtn').addEventListener('click', function(e) {
-window.location.href = googleUrl;
+  window.location.href = googleUrl;
 });
 
 document.getElementById('meutimeBtn').addEventListener('click', function(e) {
-window.location.href = meutimeUrl;
-});
-
-document.getElementById('meutimeText').addEventListener('click', function(e) {
-window.location.href = "https://www.espn.com.br/futebol/time/_/id/3445/fluminense";
+  window.location.href = meutimeUrl;
 });
 
 document.getElementById('brasilBtn').addEventListener('click', function(e) {
-window.location.href = "https://www.cbf.com.br/";
+  window.location.href = "https://www.cbf.com.br/";
 });
 
 // Service worker
 if ('serviceWorker' in navigator) {
-navigator.serviceWorker.register('../sw.js');
+  navigator.serviceWorker.register('../sw.js');
 }
 </script>
 </body>
