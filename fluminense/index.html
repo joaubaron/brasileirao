@@ -29,11 +29,13 @@ min-height: 100vh;
 display: flex;
 align-items: center;
 justify-content: center;
+overflow: hidden;       /* ← adicionar */
+touch-action: none;     /* ← adicionar */
 }
 
 .card {
 text-align: center;
-padding: 2rem;
+padding: 0.1rem 2rem 2rem 2rem;
 }
 
 .logo {
@@ -136,18 +138,20 @@ const meutimeUrl = "https://www.fluminense.com.br/site/";
 document.getElementById('verBtn').addEventListener('click', function(e) {
 window.location.href = googleUrl;
 });
-
 document.getElementById('meutimeBtn').addEventListener('click', function(e) {
 window.location.href = meutimeUrl;
 });
-
 document.getElementById('brasilBtn').addEventListener('click', function(e) {
 window.location.href = "https://www.cbf.com.br/";
 });
-
 document.getElementById('becBtn').addEventListener('click', function(e) {
 window.location.href = "https://www.becsaf.com.br/";
 });
+
+// Bloqueia scroll por toque
+document.addEventListener('touchmove', function(e) {
+e.preventDefault();
+}, { passive: false });
 
 // Service worker
 if ('serviceWorker' in navigator) {
