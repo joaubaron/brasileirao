@@ -6,9 +6,10 @@ const ASSETS = [
   '/brasileirao/icon-512.png',
   '/brasileirao/brasil.png',
   '/brasileirao/bec.png',
-  '/brasileirao/bola.png',
   '/brasileirao/fluminense/index.html',
-  '/brasileirao/fluminense/meutime.png'
+  '/brasileirao/fluminense/meutime.png',
+  '/brasileirao/flamengo/index.html',
+  '/brasileirao/flamengo/meutime.png'
 ];
 
 self.addEventListener('install', e => {
