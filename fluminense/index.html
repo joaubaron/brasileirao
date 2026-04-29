@@ -78,22 +78,28 @@ user-select: none;
 transform: scale(0.96);
 }
 
-.meutime-logo {
-width: 100px;
-height: 100px;
-margin-top: 2rem;
-cursor: pointer;
-border-radius: 12px;
-display: block;
-margin-left: auto;
-margin-right: auto;
--webkit-tap-highlight-color: transparent;
-user-select: none;
--webkit-user-select: none;
+/* NOVAS CLASSES PARA OS LOGOS LADO A LADO */
+.logos-container {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2rem;
 }
 
-.meutime-logo:active {
+.time-logo {
+  width: 100px;
+  height: 100px;
+  cursor: pointer;
+  border-radius: 12px;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
 }
+
+.time-logo:active {
+}
+/* FIM DAS NOVAS CLASSES */
 
 </style>
 </head>
@@ -103,7 +109,14 @@ user-select: none;
 <p style="color: white; font-size: 14px; font-weight: 500;">Campeonatos, jogos e resultados</p>
 <a href="#" class="btn" id="verBtn">Ver Classificação ⚽</a>
 <br>
-<img src="meutime.png" alt="meutime" class="meutime-logo" id="meutimeBtn">
+
+<!-- MUDANÇA AQUI: DOIS LOGOS LADO A LADO -->
+<div class="logos-container">
+  <img src="meutime.png" alt="meutime" class="time-logo" id="meutimeBtn">
+  <img src="brasil.png" alt="Brasil" class="time-logo" id="brasilBtn">
+</div>
+<!-- FIM DA MUDANÇA -->
+
 <p style="color: white; margin-top: 8px; font-size: 14px; font-weight: 500; cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;" id="meutimeText">Fluminense Football Club</p>
 </div>
 
@@ -121,6 +134,11 @@ window.location.href = meutimeUrl;
 
 document.getElementById('meutimeText').addEventListener('click', function(e) {
 window.location.href = "https://www.fluminense.com.br/site/";
+});
+
+// NOVO EVENTO PARA O BRASIL
+document.getElementById('brasilBtn').addEventListener('click', function(e) {
+window.location.href = "https://www.cbf.com.br/";
 });
 
 // Service worker
