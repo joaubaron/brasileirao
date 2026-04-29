@@ -1,4 +1,4 @@
-const CACHE_VERSION = '29.04.2026-1221';
+const CACHE_VERSION = '29.04.2026-1224';
 const CACHE_NAME = `brasileirao-${CACHE_VERSION}`;
 const ASSETS = [
   '/brasileirao/manifest.json',
@@ -6,6 +6,7 @@ const ASSETS = [
   '/brasileirao/icon-512.png',
   '/brasileirao/brasil.png',
   '/brasileirao/bec.png',
+  '/brasileirao/bola.png',
   '/brasileirao/fluminense/index.html',
   '/brasileirao/fluminense/meutime.png'
 ];
