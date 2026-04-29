@@ -6,6 +6,7 @@ const ASSETS = [
   '/brasileirao/icon-512.png',
   '/brasileirao/brasil.png',
   '/brasileirao/bec.png',
+  '/brasileirao/bola.png',
   '/brasileirao/fluminense/index.html',
   '/brasileirao/fluminense/meutime.png'
 ];
