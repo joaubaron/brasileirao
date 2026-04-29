@@ -1,4 +1,4 @@
-const CACHE_VERSION = '29.04.2026-1443';
+const CACHE_VERSION = '29.04.2026-1444';
 const CACHE_NAME = `brasileirao-${CACHE_VERSION}`;
 const ASSETS = [
   '/brasileirao/icon-192.png',
