@@ -1,6 +1,6 @@
 {
-  "name": "Brasileirão - Flamengo",
-  "short_name": "Fla",
+  "name": "Flamengo",
+  "short_name": "Flamengo",
   "start_url": "/brasileirao/flamengo/index.html",
   "scope": "/brasileirao/flamengo/",
   "display": "standalone",
