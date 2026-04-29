@@ -6,7 +6,7 @@
 <title>Brasileirão Série A</title>
 
 <!-- PWA -->
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="../manifest.json">
 <meta name="theme-color" content="#1a1f45">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,9 +14,9 @@
 <meta name="apple-mobile-web-app-title" content="Brasileirão">
 
 <!-- Ícones -->
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="apple-touch-icon" href="../icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="../icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="../icon-512.png">
 
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -78,54 +78,75 @@ user-select: none;
 transform: scale(0.96);
 }
 
-.fluminense-logo {
+/* NOVAS CLASSES PARA OS LOGOS LADO A LADO */
+.logos-container {
+display: flex;
+gap: 20px;
+justify-content: center;
+align-items: center;
+margin-top: 2rem;
+}
+
+.time-logo {
 width: 100px;
 height: 100px;
-margin-top: 2rem;
 cursor: pointer;
 border-radius: 12px;
-display: block;
-margin-left: auto;
-margin-right: auto;
 -webkit-tap-highlight-color: transparent;
 user-select: none;
 -webkit-user-select: none;
 }
 
-.fluminense-logo:active {
+#brasilBtn {
+width: 120px;
+height: 120px;
 }
+
+.time-logo:active {
+}
+/* FIM DAS NOVAS CLASSES */
 
 </style>
 </head>
 <body>
 <div class="card">
-<img src="icon-512.png" alt="Brasileirão" class="logo">
+<img src="../icon-512.png" alt="Brasileirão" class="logo">
 <p style="color: white; font-size: 14px; font-weight: 500;">Campeonatos, jogos e resultados</p>
 <a href="#" class="btn" id="verBtn">Ver Classificação ⚽</a>
 <br>
-<img src="fluminense.png" alt="Fluminense" class="fluminense-logo" id="fluminenseBtn">
-<p style="color: white; margin-top: 8px; font-size: 14px; font-weight: 500; cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;" id="fluminenseText">Fluminense Football Club</p>
+
+<!-- MUDANÇA AQUI: DOIS LOGOS LADO A LADO -->
+<div class="logos-container">
+<img src="meutime.png" alt="meutime" class="time-logo" id="meutimeBtn">
+<img src="../brasil.png" alt="Brasil" class="time-logo" id="brasilBtn">
+</div>
+<!-- FIM DA MUDANÇA -->
+
 </div>
 
 <script>
 const googleUrl = "https://www.espn.com.br/futebol/classificacao";
-const fluminenseUrl = "https://www.espn.com.br/futebol/time/_/id/3445/fluminense";
+const meutimeUrl = "https://www.fluminense.com.br/site/";
 
 document.getElementById('verBtn').addEventListener('click', function(e) {
 window.location.href = googleUrl;
 });
 
-document.getElementById('fluminenseBtn').addEventListener('click', function(e) {
-window.location.href = fluminenseUrl;
+document.getElementById('meutimeBtn').addEventListener('click', function(e) {
+window.location.href = meutimeUrl;
 });
 
-document.getElementById('fluminenseText').addEventListener('click', function(e) {
-window.location.href = "https://www.fluminense.com.br/site/";
+document.getElementById('meutimeText').addEventListener('click', function(e) {
+window.location.href = "https://www.espn.com.br/futebol/time/_/id/3445/fluminense";
+});
+
+document.getElementById('brasilBtn').addEventListener('click', function(e) {
+window.location.href = "https://www.cbf.com.br/";
 });
 
 // Service worker
 if ('serviceWorker' in navigator) {
-navigator.serviceWorker.register('sw.js');
+navigator.serviceWorker.register('../sw.js');
 }
 </script>
 </body>
