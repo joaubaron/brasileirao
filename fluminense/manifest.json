@@ -1,6 +1,6 @@
 {
-  "name": "Brasileirão - Fluminense",
-  "short_name": "Flu",
+  "name": "Fluminense",
+  "short_name": "Fluminense",
   "start_url": "/brasileirao/fluminense/index.html",
   "scope": "/brasileirao/fluminense/",
   "display": "standalone",
