@@ -1,4 +1,4 @@
-const CACHE_VERSION = '29.04.2026-1237';
+const CACHE_VERSION = '29.04.2026-1239';
 const CACHE_NAME = `brasileirao-${CACHE_VERSION}`;
 const ASSETS = [
   '/brasileirao/manifest.json',
