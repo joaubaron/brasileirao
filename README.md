@@ -16,7 +16,7 @@ Escudo do time.
 ### `vasco/manifest.json`
 ```json
 {
-  "name": "Brasileirão - Vasco",
+  "name": "Vasco",
   "short_name": "Vasco",
   "start_url": "/brasileirao/vasco/index.html",
   "scope": "/brasileirao/vasco/",
