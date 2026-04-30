@@ -139,15 +139,14 @@ justify-content: center;
 <body>
 <div class="card">
 <img src="../bola.png" alt="Brasileirão" class="logo">
-<br>
-<p style="color: white; font-size: 16px; font-weight: 500; cursor:pointer;" id="verBtn">⚽ Campeonatos, jogos e resultados</p>
+<br><br>
+<p style="color: white; font-size: 14px; font-weight: 500; cursor:pointer;" id="verBtn">⚽ Campeonatos, jogos e resultados</p>
 <!-- MUDANÇA AQUI: TRÊS LOGOS LADO A LADO -->
 <div class="logos-container">
 <img src="meutime.png" alt="meutime" class="time-logo" id="meutimeBtn">
 <img src="../brasil.png" alt="Brasil" class="time-logo" id="brasilBtn">
 <img src="../bec.png" alt="BEC" class="time-logo" id="becBtn">
 </div>
-<br><br>
 <!-- FIM DA MUDANÇA -->
 <div class="placares-linha">
   <div class="placar-badge" id="placar-flu">⏳ Fluminense</div>
@@ -273,9 +272,19 @@ async function _placarBra() {
   el.textContent = '🇧🇷 BRA';
 }
 
-_placarFlu();
-_placarBra();
-setInterval(() => { _placarFlu(); _placarBra(); }, 30000);
+async function _debug() {
+  const el = document.getElementById('placar-flu');
+  el.textContent = '🔄 testando proxy...';
+  try {
+    const url = 'https://api.football-data.org/v4/competitions/BSA/matches?status=SCHEDULED&limit=3';
+    const r = await fetch('https://corsproxy.io/?url=' + encodeURIComponent(url), {headers:{'X-Auth-Token':_TOKEN}});
+    const txt = await r.text();
+    el.textContent = 'HTTP ' + r.status + '\n' + txt.substring(0,80);
+  } catch(e) {
+    el.textContent = '❌ ' + e.message;
+  }
+}
+_debug();
 </script>
 </body>
 </html>
