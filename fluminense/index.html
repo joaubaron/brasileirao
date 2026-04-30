@@ -188,7 +188,9 @@ const TIME_FLUMINENSE_ID = 1783;
 
 async function buscarJogoFluminenseReal() {
   try {
-    const response = await fetch(`${WORKER_URL}/fluminense`);
+    const response = await fetch(`${WORKER_URL}/fluminense`, {
+  cache: "no-store"
+});
     const data = await response.json();
 
     if (!data.matches || data.matches.length === 0) {
