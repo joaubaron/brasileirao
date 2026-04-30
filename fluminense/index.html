@@ -29,8 +29,8 @@ min-height: 100vh;
 display: flex;
 align-items: center;
 justify-content: center;
-overflow: hidden;       /* ← adicionar */
-touch-action: none;     /* ← adicionar */
+overflow: hidden;
+touch-action: none;
 }
 
 .card {
@@ -81,7 +81,6 @@ user-select: none;
 transform: scale(0.96);
 }
 
-/* NOVAS CLASSES PARA OS LOGOS LADO A LADO */
 .logos-container {
 display: flex;
 gap: 20px;
@@ -107,89 +106,71 @@ position: relative;
 bottom: 2px;
 }
 
-.time-logo:active {
-}
-/* FIM DAS NOVAS CLASSES */
-
-/* ===== NOVOS ESTILOS DOS PLACARES (APENAS ADICIONADOS, NADA REMOVIDO) ===== */
-.placares-duplo {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    align-items: stretch;
-    margin: 20px 0 10px 0;
-    flex-wrap: wrap;
+/* NOVOS ESTILOS PARA OS PLACARES LADO A LADO */
+.placares-container {
+display: flex;
+gap: 30px;
+justify-content: center;
+align-items: flex-start;
+margin-top: 1.5rem;
+flex-wrap: wrap;
 }
 
-.time-placar-card {
-    flex: 1;
-    min-width: 180px;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(8px);
-    border-radius: 24px;
-    padding: 16px 12px;
-    border: 1px solid rgba(255,255,255,0.15);
-    transition: all 0.2s;
+.placar-card {
+background: rgba(0,0,0,0.5);
+border-radius: 16px;
+padding: 12px 16px;
+min-width: 200px;
+backdrop-filter: blur(10px);
+text-align: center;
 }
 
-.time-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 14px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
+.placar-titulo {
+color: white;
+font-size: 0.9rem;
+font-weight: bold;
+margin-bottom: 8px;
+border-bottom: 1px solid rgba(255,255,255,0.3);
+padding-bottom: 4px;
 }
 
-.time-nome {
-    font-weight: bold;
-    font-size: 1.1rem;
-    color: white;
+.placar-status {
+font-size: 0.75rem;
+font-weight: bold;
+margin-bottom: 8px;
 }
 
-.placar-destaque {
-    font-size: 2rem;
-    font-weight: 800;
-    color: #FFE484;
-    margin: 8px 0;
-    letter-spacing: 2px;
+.placar-status.ao-vivo {
+color: #ff4444;
 }
 
-.ao-vivo-badge {
-    background: #e84118;
-    color: white;
-    font-weight: bold;
-    font-size: 0.7rem;
-    padding: 4px 10px;
-    border-radius: 20px;
-    display: inline-block;
-    margin-bottom: 8px;
+.placar-status.sem-jogo {
+color: #ffaa44;
 }
 
-.partida-status {
-    font-size: 0.7rem;
-    color: #ffbc6e;
-    margin-top: 6px;
+.placar-jogo {
+color: white;
+font-size: 1.3rem;
+font-weight: bold;
+margin: 8px 0;
 }
 
-.nenhum-jogo {
-    color: #b9c3ff;
-    font-weight: 500;
-    font-size: 0.8rem;
-    padding: 6px 0;
+.placar-info {
+color: rgba(255,255,255,0.8);
+font-size: 0.7rem;
 }
 
 .proximo-jogo {
-    font-size: 0.7rem;
-    margin-top: 10px;
-    padding-top: 8px;
-    border-top: 1px solid rgba(255,255,255,0.15);
-    color: #aab4e6;
-    line-height: 1.4;
+color: #4caf50;
+font-size: 0.7rem;
+margin-top: 6px;
 }
-/* ===== FIM DOS ESTILOS DOS PLACARES ===== */
 
+.loading {
+color: rgba(255,255,255,0.6);
+font-size: 0.7rem;
+padding: 10px;
+}
 </style>
 </head>
 <body>
@@ -200,43 +181,31 @@ bottom: 2px;
 <a href="#" class="btn" id="verBtn">Ver Classificação ⚽</a>
 <br><br>
 
-<!-- MUDANÇA AQUI: TRÊS LOGOS LADO A LADO -->
 <div class="logos-container">
 <img src="meutime.png" alt="meutime" class="time-logo" id="meutimeBtn">
 <img src="../brasil.png" alt="Brasil" class="time-logo" id="brasilBtn">
 <img src="../bec.png" alt="BEC" class="time-logo" id="becBtn">
 </div>
-<!-- FIM DA MUDANÇA -->
 
-<!-- ===== NOVO: DOIS PLACARES LADO A LADO (FLUMINENSE + BRASIL) ===== -->
-<div class="placares-duplo">
-    <!-- PLACAR FLUMINENSE -->
-    <div class="time-placar-card" id="fluminenseCard">
-        <div class="time-header">
-            <span class="time-nome">🇭🇺 FLUMINENSE</span>
-        </div>
-        <div id="fluPlacarContent">
-            <div class="nenhum-jogo">⚽ Carregando...</div>
-        </div>
-    </div>
-
-    <!-- PLACAR BRASIL -->
-    <div class="time-placar-card" id="brasilCard">
-        <div class="time-header">
-            <span class="time-nome">🇧🇷 BRASIL</span>
-        </div>
-        <div id="brasilPlacarContent">
-            <div class="nenhum-jogo">⚽ Carregando...</div>
-        </div>
-    </div>
+<!-- PLACARES LADO A LADO -->
+<div class="placares-container">
+<div class="placar-card" id="placarFluminense">
+<div class="placar-titulo">🇭🇺 FLUMINENSE</div>
+<div class="loading">Carregando...</div>
 </div>
-<!-- ===== FIM DOS PLACARES ===== -->
+
+<div class="placar-card" id="placarBrasil">
+<div class="placar-titulo">🇧🇷 BRASIL</div>
+<div class="loading">Carregando...</div>
+</div>
+</div>
 
 </div>
 
 <script>
 const googleUrl = "https://www.espn.com.br/futebol/classificacao";
 const meutimeUrl = "https://www.fluminense.com.br/site/";
+const API_TOKEN = "097a10c756d8414bab6f4d152de93b41";
 
 document.getElementById('verBtn').addEventListener('click', function(e) {
 window.location.href = googleUrl;
@@ -256,197 +225,231 @@ document.addEventListener('touchmove', function(e) {
 e.preventDefault();
 }, { passive: false });
 
+// FUNÇÃO PARA BUSCAR JOGOS DO FLUMINENSE (TIMES BRASILEIROS)
+async function buscarJogoFluminense() {
+const timeId = 1783; // ID do Fluminense na API
+const url = `https://api.football-data.org/v4/teams/${timeId}/matches?status=LIVE,IN_PLAY,PAUSED,SCHEDULED&limit=5`;
+
+try {
+const response = await fetch(url, {
+headers: { 'X-Auth-Token': API_TOKEN }
+});
+const data = await response.json();
+
+// Procura jogo ao vivo primeiro
+const jogoAoVivo = data.matches?.find(m => 
+m.status === 'LIVE' || m.status === 'IN_PLAY' || m.status === 'PAUSED'
+);
+
+if (jogoAoVivo) {
+const golsMandante = jogoAoVivo.score?.fullTime?.home ?? jogoAoVivo.score?.halfTime?.home ?? 0;
+const golsVisitante = jogoAoVivo.score?.fullTime?.away ?? jogoAoVivo.score?.halfTime?.away ?? 0;
+let tempo = '';
+if (jogoAoVivo.status === 'LIVE' || jogoAoVivo.status === 'IN_PLAY') {
+tempo = `${jogoAoVivo.minute || '0'}' - ${jogoAoVivo.matchday ? `${jogoAoVivo.matchday}ª Rodada` : '2º Tempo'}`;
+} else if (jogoAoVivo.status === 'PAUSED') {
+tempo = 'Intervalo';
+}
+
+return {
+temJogo: true,
+aoVivo: true,
+mandante: jogoAoVivo.homeTeam?.name || 'Fluminense',
+visitante: jogoAoVivo.awayTeam?.name || 'Adversário',
+golsMandante: golsMandante,
+golsVisitante: golsVisitante,
+tempo: tempo
+};
+}
+
+// Se não tem ao vivo, pega próximo jogo
+const proximoJogo = data.matches?.find(m => 
+m.status === 'SCHEDULED' && new Date(m.utcDate) > new Date()
+);
+
+if (proximoJogo) {
+const dataJogo = new Date(proximoJogo.utcDate);
+const diasSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+const diaSemana = diasSemana[dataJogo.getDay()];
+const hora = dataJogo.getHours().toString().padStart(2,'0');
+const minuto = dataJogo.getMinutes().toString().padStart(2,'0');
+const mandante = proximoJogo.homeTeam?.name || 'Fluminense';
+const visitante = proximoJogo.awayTeam?.name || 'Adversário';
+
+return {
+temJogo: true,
+aoVivo: false,
+proximo: `${mandante} x ${visitante}`,
+data: `${diaSemana} • ${hora}:${minuto}`,
+local: 'Maracanã'
+};
+}
+
+return { temJogo: false };
+} catch (error) {
+console.error('Erro Fluminense:', error);
+return { temJogo: false, erro: true };
+}
+}
+
+// FUNÇÃO PARA BUSCAR JOGOS DO BRASIL (SELEÇÃO)
+async function buscarJogoBrasil() {
+const timeId = 764; // ID da Seleção Brasileira
+const url = `https://api.football-data.org/v4/teams/${timeId}/matches?status=LIVE,IN_PLAY,PAUSED,SCHEDULED&limit=5`;
+
+try {
+const response = await fetch(url, {
+headers: { 'X-Auth-Token': API_TOKEN }
+});
+const data = await response.json();
+
+const jogoAoVivo = data.matches?.find(m => 
+m.status === 'LIVE' || m.status === 'IN_PLAY' || m.status === 'PAUSED'
+);
+
+if (jogoAoVivo) {
+const golsMandante = jogoAoVivo.score?.fullTime?.home ?? jogoAoVivo.score?.halfTime?.home ?? 0;
+const golsVisitante = jogoAoVivo.score?.fullTime?.away ?? jogoAoVivo.score?.halfTime?.away ?? 0;
+let tempo = '';
+if (jogoAoVivo.status === 'LIVE' || jogoAoVivo.status === 'IN_PLAY') {
+tempo = `${jogoAoVivo.minute || '0'}' - 2º Tempo`;
+} else if (jogoAoVivo.status === 'PAUSED') {
+tempo = 'Intervalo';
+}
+
+return {
+temJogo: true,
+aoVivo: true,
+mandante: jogoAoVivo.homeTeam?.name || 'Brasil',
+visitante: jogoAoVivo.awayTeam?.name || 'Adversário',
+golsMandante: golsMandante,
+golsVisitante: golsVisitante,
+tempo: tempo
+};
+}
+
+const proximoJogo = data.matches?.find(m => 
+m.status === 'SCHEDULED' && new Date(m.utcDate) > new Date()
+);
+
+if (proximoJogo) {
+const dataJogo = new Date(proximoJogo.utcDate);
+const diasSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+const diaSemana = diasSemana[dataJogo.getDay()];
+const hora = dataJogo.getHours().toString().padStart(2,'0');
+const minuto = dataJogo.getMinutes().toString().padStart(2,'0');
+const mandante = proximoJogo.homeTeam?.name || 'Brasil';
+const visitante = proximoJogo.awayTeam?.name || 'Adversário';
+
+return {
+temJogo: true,
+aoVivo: false,
+proximo: `${mandante} x ${visitante}`,
+data: `${diaSemana} • ${hora}:${minuto}`,
+local: proximoJogo.venue || 'Estádio'
+};
+}
+
+return { temJogo: false };
+} catch (error) {
+console.error('Erro Brasil:', error);
+return { temJogo: false, erro: true };
+}
+}
+
+// FUNÇÃO PARA ATUALIZAR O HTML DOS PLACARES
+function atualizarPlacarFluminense(dados) {
+const container = document.getElementById('placarFluminense');
+if (!container) return;
+
+if (dados.erro) {
+container.innerHTML = `
+<div class="placar-titulo">🇭🇺 FLUMINENSE</div>
+<div class="placar-status sem-jogo">⚠️ Erro ao carregar</div>
+<div class="placar-info">Tente novamente mais tarde</div>
+`;
+return;
+}
+
+if (dados.temJogo && dados.aoVivo) {
+container.innerHTML = `
+<div class="placar-titulo">🇭🇺 FLUMINENSE</div>
+<div class="placar-status ao-vivo">🔴 AO VIVO</div>
+<div class="placar-jogo">${dados.mandante.split(' ')[0]} ${dados.golsMandante} x ${dados.golsVisitante} ${dados.visitante.split(' ')[0]}</div>
+<div class="placar-info">${dados.tempo}</div>
+`;
+} else if (dados.temJogo && !dados.aoVivo) {
+container.innerHTML = `
+<div class="placar-titulo">🇭🇺 FLUMINENSE</div>
+<div class="placar-status sem-jogo">⚽ Nenhum jogo ao vivo</div>
+<div class="placar-info">Próximo: ${dados.proximo}</div>
+<div class="proximo-jogo">${dados.data} • ${dados.local}</div>
+`;
+} else {
+container.innerHTML = `
+<div class="placar-titulo">🇭🇺 FLUMINENSE</div>
+<div class="placar-status sem-jogo">⚽ Nenhum jogo ao vivo</div>
+<div class="placar-info">Sem próximos jogos programados</div>
+`;
+}
+}
+
+function atualizarPlacarBrasil(dados) {
+const container = document.getElementById('placarBrasil');
+if (!container) return;
+
+if (dados.erro) {
+container.innerHTML = `
+<div class="placar-titulo">🇧🇷 BRASIL</div>
+<div class="placar-status sem-jogo">⚠️ Erro ao carregar</div>
+<div class="placar-info">Tente novamente mais tarde</div>
+`;
+return;
+}
+
+if (dados.temJogo && dados.aoVivo) {
+container.innerHTML = `
+<div class="placar-titulo">🇧🇷 BRASIL</div>
+<div class="placar-status ao-vivo">🔴 AO VIVO</div>
+<div class="placar-jogo">${dados.mandante.split(' ')[0]} ${dados.golsMandante} x ${dados.golsVisitante} ${dados.visitante.split(' ')[0]}</div>
+<div class="placar-info">${dados.tempo}</div>
+`;
+} else if (dados.temJogo && !dados.aoVivo) {
+container.innerHTML = `
+<div class="placar-titulo">🇧🇷 BRASIL</div>
+<div class="placar-status sem-jogo">⚽ Nenhum jogo ao vivo</div>
+<div class="placar-info">Próximo: ${dados.proximo}</div>
+<div class="proximo-jogo">${dados.data} • ${dados.local}</div>
+`;
+} else {
+container.innerHTML = `
+<div class="placar-titulo">🇧🇷 BRASIL</div>
+<div class="placar-status sem-jogo">⚽ Nenhum jogo ao vivo</div>
+<div class="placar-info">Sem próximos jogos programados</div>
+`;
+}
+}
+
+// CARREGAR OS DADOS
+async function carregarTodosPlacares() {
+const [fluminense, brasil] = await Promise.all([
+buscarJogoFluminense(),
+buscarJogoBrasil()
+]);
+atualizarPlacarFluminense(fluminense);
+atualizarPlacarBrasil(brasil);
+}
+
+// ATUALIZAR A CADA 30 SEGUNDOS SE HOUVER JOGO AO VIVO
+carregarTodosPlacares();
+setInterval(() => {
+carregarTodosPlacares();
+}, 30000);
+
 // Service worker
 if ('serviceWorker' in navigator) {
 navigator.serviceWorker.register('../sw.js');
 }
-
-// ===== NOVO CÓDIGO DOS PLACARES COM API FOOTBALL-DATA.ORG =====
-// API Token fornecida pelo usuário
-const API_TOKEN = '097a10c756d8414bab6f4d152de93b41';
-const headers = { 'X-Auth-Token': API_TOKEN };
-
-// IDs dos times pela football-data.org
-// Fluminense = 1783 (Brasileirão Série A)
-// Seleção Brasileira = 764
-const FLU_ID = 1783;
-const BRAZIL_ID = 764;
-
-// Função para buscar partidas de um time
-async function fetchTeamMatches(teamId) {
-    const url = `https://api.football-data.org/v4/teams/${teamId}/matches?limit=12&status=SCHEDULED,LIVE,IN_PLAY,PAUSED,FINISHED`;
-    try {
-        const response = await fetch(url, { headers });
-        if (!response.ok) {
-            console.warn(`Erro ${response.status} para time ${teamId}`);
-            return null;
-        }
-        const data = await response.json();
-        return data.matches || [];
-    } catch (err) {
-        console.error("Erro na requisição:", err);
-        return null;
-    }
-}
-
-// Processa os jogos e retorna { live, next }
-function processMatches(matches, teamName) {
-    if (!matches || matches.length === 0) {
-        return { live: null, next: null };
-    }
-    
-    // Procura jogo AO VIVO (LIVE, IN_PLAY, PAUSED)
-    const liveMatch = matches.find(m => m.status === 'LIVE' || m.status === 'IN_PLAY' || m.status === 'PAUSED');
-    if (liveMatch) {
-        return { live: liveMatch, next: null };
-    }
-    
-    // Próximo jogo agendado (SCHEDULED e data futura)
-    const now = new Date();
-    const upcoming = matches
-        .filter(m => m.status === 'SCHEDULED' && new Date(m.utcDate) > now)
-        .sort((a, b) => new Date(a.utcDate) - new Date(b.utcDate));
-    
-    const nextMatch = upcoming.length > 0 ? upcoming[0] : null;
-    return { live: null, next: nextMatch };
-}
-
-// Renderiza jogo AO VIVO
-function renderLiveMatch(match, teamId) {
-    // Identifica se o time é mandante ou visitante
-    let isHome = (match.homeTeam.id === teamId);
-    let opponentName = isHome ? match.awayTeam.name : match.homeTeam.name;
-    
-    // Busca os gols (fullTime, se não tiver, usa halfTime)
-    let homeScore = match.score?.fullTime?.home ?? match.score?.halfTime?.home ?? 0;
-    let awayScore = match.score?.fullTime?.away ?? match.score?.halfTime?.away ?? 0;
-    
-    let ourScore = isHome ? homeScore : awayScore;
-    let opponentScore = isHome ? awayScore : homeScore;
-    
-    // Minuto do jogo
-    let minute = match.minute || '';
-    let statusText = '🔴 AO VIVO';
-    if (match.status === 'PAUSED') statusText = '⏸️ INTERVALO';
-    
-    let minuteDisplay = '';
-    if (minute && minute > 0) {
-        minuteDisplay = `${minute}'`;
-    } else if (match.status === 'PAUSED') {
-        minuteDisplay = 'Intervalo';
-    } else {
-        minuteDisplay = '1º Tempo';
-    }
-    
-    // Limita nome do adversário
-    let shortOpp = opponentName.length > 18 ? opponentName.substring(0, 16) + '..' : opponentName;
-    
-    return `
-        <div class="ao-vivo-badge">${statusText}</div>
-        <div class="placar-destaque">${ourScore} x ${opponentScore}</div>
-        <div class="partida-status">vs ${shortOpp} • ${minuteDisplay}</div>
-    `;
-}
-
-// Renderiza PRÓXIMO JOGO (quando não tem ao vivo)
-function renderNextMatch(nextMatch, teamId) {
-    let isHome = (nextMatch.homeTeam.id === teamId);
-    let opponentName = isHome ? nextMatch.awayTeam.name : nextMatch.homeTeam.name;
-    
-    const matchDate = new Date(nextMatch.utcDate);
-    const diaSemana = matchDate.toLocaleDateString('pt-BR', { weekday: 'short' });
-    const dia = matchDate.getDate();
-    const mes = matchDate.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
-    const horas = matchDate.getHours().toString().padStart(2, '0');
-    const minutos = matchDate.getMinutes().toString().padStart(2, '0');
-    
-    let dataFormatada = `${diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1)} • ${dia}/${mes} • ${horas}h${minutos}`;
-    
-    // Local aproximado
-    let local = isHome ? 'Maracanã' : (nextMatch.venue || 'Estádio');
-    
-    let shortOpp = opponentName.length > 20 ? opponentName.substring(0, 18) + '..' : opponentName;
-    
-    return `
-        <div class="nenhum-jogo">⚽ Nenhum jogo ao vivo</div>
-        <div class="proximo-jogo">
-            ⏩ PRÓXIMO: ${shortOpp}<br>
-            📅 ${dataFormatada} • ${local}
-        </div>
-    `;
-}
-
-// Renderiza fallback quando a API falha ou não retorna dados
-function renderFluFallback() {
-    return `
-        <div class="nenhum-jogo">⚽ Nenhum jogo ao vivo</div>
-        <div class="proximo-jogo">
-            Próximo: Fluminense x Vasco<br>
-            Sábado • 16h • Maracanã
-        </div>
-    `;
-}
-
-function renderBrasilFallback() {
-    return `
-        <div class="nenhum-jogo">⚽ Nenhum jogo ao vivo</div>
-        <div class="proximo-jogo">
-            Próximo: Brasil x Argentina<br>
-            Terça • 21h30 • Estádio Nacional
-        </div>
-    `;
-}
-
-// Atualiza o placar do Fluminense
-async function updateFluminenseScore() {
-    const matches = await fetchTeamMatches(FLU_ID);
-    const fluContent = document.getElementById('fluPlacarContent');
-    
-    if (matches && matches.length > 0) {
-        const { live, next } = processMatches(matches, 'Fluminense');
-        if (live) {
-            fluContent.innerHTML = renderLiveMatch(live, FLU_ID);
-        } else if (next) {
-            fluContent.innerHTML = renderNextMatch(next, FLU_ID);
-        } else {
-            fluContent.innerHTML = renderFluFallback();
-        }
-    } else {
-        fluContent.innerHTML = renderFluFallback();
-    }
-}
-
-// Atualiza o placar do Brasil
-async function updateBrasilScore() {
-    const matches = await fetchTeamMatches(BRAZIL_ID);
-    const brasilContent = document.getElementById('brasilPlacarContent');
-    
-    if (matches && matches.length > 0) {
-        const { live, next } = processMatches(matches, 'Brasil');
-        if (live) {
-            brasilContent.innerHTML = renderLiveMatch(live, BRAZIL_ID);
-        } else if (next) {
-            brasilContent.innerHTML = renderNextMatch(next, BRAZIL_ID);
-        } else {
-            brasilContent.innerHTML = renderBrasilFallback();
-        }
-    } else {
-        brasilContent.innerHTML = renderBrasilFallback();
-    }
-}
-
-// Atualiza ambos os placares
-function updateAllScores() {
-    updateFluminenseScore
-    updateBrasilScore();
-}
-
-// Atualiza a cada 45 segundos (para manter jogo ao vivo sincronizado)
-updateAllScores();
-setInterval(updateAllScores, 45000);
-
-// ===== FIM DO CÓDIGO DOS PLACARES =====
-
 </script>
 </body>
 </html>
