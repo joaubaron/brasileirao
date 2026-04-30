@@ -93,16 +93,12 @@ position: relative;
 bottom: 2px;
 }
 
-/* PLACARES LADO A LADO - MESMA LINHA - SEM WRAP */
-.placares-wrapper {
+/* APENAS FLUMINENSE - CENTRALIZADO */
+.placar-central {
 display: flex;
-flex-direction: row;
 justify-content: center;
-align-items: stretch;
-gap: 15px;
 margin-top: 20px;
 width: 100%;
-/* REMOVI O flex-wrap: wrap */
 }
 
 .placar-card {
@@ -176,15 +172,10 @@ padding: 10px;
 <img src="../bec.png" alt="BEC" class="time-logo" id="becBtn">
 </div>
 
-<!-- PLACARES LADO A LADO -->
-<div class="placares-wrapper">
+<!-- APENAS PLACAR DO FLUMINENSE CENTRALIZADO -->
+<div class="placar-central">
 <div class="placar-card" id="placarFluminense">
 <div class="placar-titulo">🇭🇺 FLUMINENSE</div>
-<div class="loading">⏳ Carregando...</div>
-</div>
-
-<div class="placar-card" id="placarBrasil">
-<div class="placar-titulo">🇧🇷 BRASIL</div>
 <div class="loading">⏳ Carregando...</div>
 </div>
 </div>
@@ -200,12 +191,6 @@ const jogosFluminense = [
     { data: "2026-04-30T19:00:00-03:00", mandante: "Bolívar", visitante: "Fluminense", local: "Hernando Siles", competicao: "Libertadores", status: "SCHEDULED" },
     { data: "2026-05-03T18:30:00-03:00", mandante: "Internacional", visitante: "Fluminense", local: "Beira-Rio", competicao: "Brasileirão", status: "SCHEDULED" },
     { data: "2026-05-10T16:00:00-03:00", mandante: "Fluminense", visitante: "Vasco", local: "Maracanã", competicao: "Brasileirão", status: "SCHEDULED" }
-];
-
-// JOGOS REAIS DA SELEÇÃO BRASILEIRA
-const jogosBrasil = [
-    { data: "2026-06-12T15:00:00-03:00", mandante: "Brasil", visitante: "Alemanha", local: "Estádio Nacional", competicao: "Copa do Mundo", status: "SCHEDULED" },
-    { data: "2026-06-17T15:00:00-03:00", mandante: "Brasil", visitante: "México", local: "Estádio Nacional", competicao: "Copa do Mundo", status: "SCHEDULED" }
 ];
 
 function buscarJogoFluminense() {
@@ -275,40 +260,6 @@ function buscarJogoFluminense() {
     return { temJogo: false };
 }
 
-function buscarJogoBrasil() {
-    const agora = new Date();
-    
-    // Próximo jogo real
-    const futuros = jogosBrasil
-        .map(j => ({ ...j, dataObj: new Date(j.data) }))
-        .filter(j => j.dataObj > agora)
-        .sort((a, b) => a.dataObj - b.dataObj);
-    
-    if (futuros.length > 0) {
-        const proximo = futuros[0];
-        const dias = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
-        const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho'];
-        
-        const diaSemana = dias[proximo.dataObj.getDay()];
-        const diaMes = proximo.dataObj.getDate();
-        const mes = meses[proximo.dataObj.getMonth()];
-        const hora = proximo.dataObj.getHours().toString().padStart(2, '0');
-        const minuto = proximo.dataObj.getMinutes().toString().padStart(2, '0');
-        
-        return {
-            temJogo: true,
-            aoVivo: false,
-            proximo: `${proximo.mandante} x ${proximo.visitante}`,
-            data: `${diaSemana} • ${hora}:${minuto}`,
-            dataCompleta: `${diaMes} de ${mes}`,
-            local: proximo.local,
-            competicao: proximo.competicao
-        };
-    }
-    
-    return { temJogo: false };
-}
-
 function atualizarPlacarFluminense(dados) {
     const container = document.getElementById('placarFluminense');
     if (!container) return;
@@ -339,34 +290,9 @@ function atualizarPlacarFluminense(dados) {
     }
 }
 
-function atualizarPlacarBrasil(dados) {
-    const container = document.getElementById('placarBrasil');
-    if (!container) return;
-    
-    if (dados.temJogo && !dados.aoVivo) {
-        container.innerHTML = `
-            <div class="placar-titulo">🇧🇷 BRASIL</div>
-            <div class="placar-status sem-jogo">⚽ Nenhum jogo ao vivo</div>
-            <div class="placar-info" style="font-weight:bold">Próximo: ${dados.proximo}</div>
-            <div class="placar-info">${dados.dataCompleta}</div>
-            <div class="proximo-jogo">${dados.data} • ${dados.local}</div>
-            <div class="placar-info" style="font-size:0.65rem;margin-top:4px">🏆 ${dados.competicao}</div>
-        `;
-    } else {
-        container.innerHTML = `
-            <div class="placar-titulo">🇧🇷 BRASIL</div>
-            <div class="placar-status sem-jogo">⚽ Nenhum jogo ao vivo</div>
-            <div class="placar-info">Próximo: Brasil x Alemanha</div>
-            <div class="proximo-jogo">12 de Junho • 15h • Estádio Nacional</div>
-        `;
-    }
-}
-
 function carregarPlacares() {
     const fluminense = buscarJogoFluminense();
-    const brasil = buscarJogoBrasil();
     atualizarPlacarFluminense(fluminense);
-    atualizarPlacarBrasil(brasil);
 }
 
 // Eventos dos botões
