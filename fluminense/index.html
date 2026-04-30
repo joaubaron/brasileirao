@@ -189,7 +189,7 @@ const TIME_FLUMINENSE_ID = 1783;
 
 async function buscarJogoFluminenseReal() {
     try {
-        // Busca jogos do Fluminense via Worker (sem CORS)
+        // Busca SOMENTE jogos do Fluminense (time ID 1783)
         const url = `${WORKER_URL}/teams/${TIME_FLUMINENSE_ID}/matches?status=LIVE,IN_PLAY,PAUSED,SCHEDULED&limit=10`;
         const response = await fetch(url);
         const data = await response.json();
@@ -198,37 +198,54 @@ async function buscarJogoFluminenseReal() {
             return { temJogo: false };
         }
         
-        // Procura jogo AO VIVO
-        const jogoAoVivo = data.matches.find(m => 
+        // Filtra APENAS jogos onde o Fluminense é mandante OU visitante
+        const jogosFluminense = data.matches.filter(m => 
+            m.homeTeam?.id === TIME_FLUMINENSE_ID || 
+            m.awayTeam?.id === TIME_FLUMINENSE_ID
+        );
+        
+        if (jogosFluminense.length === 0) {
+            return { temJogo: false };
+        }
+        
+        // Procura jogo AO VIVO do Fluminense
+        const jogoAoVivo = jogosFluminense.find(m => 
             m.status === 'LIVE' || m.status === 'IN_PLAY' || m.status === 'PAUSED'
         );
         
         if (jogoAoVivo) {
-            const golsHome = jogoAoVivo.score?.fullTime?.home ?? jogoAoVivo.score?.halfTime?.home ?? 0;
-            const golsAway = jogoAoVivo.score?.fullTime?.away ?? jogoAoVivo.score?.halfTime?.away ?? 0;
+            const ehMandante = jogoAoVivo.homeTeam?.id === TIME_FLUMINENSE_ID;
+            const golsFluminense = ehMandante ? 
+                (jogoAoVivo.score?.fullTime?.home ?? jogoAoVivo.score?.halfTime?.home ?? 0) : 
+                (jogoAoVivo.score?.fullTime?.away ?? jogoAoVivo.score?.halfTime?.away ?? 0);
+            const golsAdversario = ehMandante ? 
+                (jogoAoVivo.score?.fullTime?.away ?? jogoAoVivo.score?.halfTime?.away ?? 0) : 
+                (jogoAoVivo.score?.fullTime?.home ?? jogoAoVivo.score?.halfTime?.home ?? 0);
             
             let tempo = '';
             if (jogoAoVivo.status === 'LIVE' || jogoAoVivo.status === 'IN_PLAY') {
-                tempo = `${jogoAoVivo.minute || 0}' - 2º Tempo`;
+                tempo = `${jogoAoVivo.minute || 0}' - ${jogoAoVivo.matchday ? `${jogoAoVivo.matchday}ª Rodada` : '2º Tempo'}`;
             } else if (jogoAoVivo.status === 'PAUSED') {
                 tempo = '⏸️ Intervalo';
             }
             
+            const nomeAdversario = ehMandante ? jogoAoVivo.awayTeam?.name : jogoAoVivo.homeTeam?.name;
+            
             return {
                 temJogo: true,
                 aoVivo: true,
-                mandante: jogoAoVivo.homeTeam?.name || 'Fluminense',
-                visitante: jogoAoVivo.awayTeam?.name || 'Adversário',
-                golsMandante: golsHome,
-                golsVisitante: golsAway,
+                mandante: ehMandante ? 'Fluminense' : nomeAdversario,
+                visitante: ehMandante ? nomeAdversario : 'Fluminense',
+                golsMandante: ehMandante ? golsFluminense : golsAdversario,
+                golsVisitante: ehMandante ? golsAdversario : golsFluminense,
                 tempo: tempo,
                 competicao: jogoAoVivo.competition?.name || ''
             };
         }
         
-        // Próximo jogo
+        // Próximo jogo do Fluminense
         const agora = new Date();
-        const proximosJogos = data.matches
+        const proximosJogos = jogosFluminense
             .filter(m => m.status === 'SCHEDULED' || m.status === 'TIMED')
             .map(m => ({ ...m, dataObj: new Date(m.utcDate) }))
             .filter(m => m.dataObj > agora)
@@ -246,10 +263,13 @@ async function buscarJogoFluminenseReal() {
             const hora = dataJogo.getHours().toString().padStart(2, '0');
             const minuto = dataJogo.getMinutes().toString().padStart(2, '0');
             
+            const ehMandante = proximo.homeTeam?.id === TIME_FLUMINENSE_ID;
+            const nomeAdversario = ehMandante ? proximo.awayTeam?.name : proximo.homeTeam?.name;
+            
             return {
                 temJogo: true,
                 aoVivo: false,
-                proximo: `${proximo.homeTeam?.name || 'Time'} x ${proximo.awayTeam?.name || 'Adversário'}`,
+                proximo: `Fluminense x ${nomeAdversario}`,
                 data: `${diaSemana} • ${hora}:${minuto}`,
                 dataCompleta: `${diaMes} de ${mes}`,
                 local: proximo.venue || 'Estádio',
