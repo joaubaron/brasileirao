@@ -29,8 +29,8 @@ min-height: 100vh;
 display: flex;
 align-items: center;
 justify-content: center;
-overflow-y: auto;
-touch-action: pan-y;
+overflow: hidden;
+touch-action: none;
 }
 
 .card {
@@ -366,9 +366,18 @@ document.getElementById('becBtn').addEventListener('click', function(e) {
     window.location.href = "https://www.becsaf.com.br/";
 });
 
+// Bloqueia scroll por toque
+document.addEventListener('touchmove', function(e) {
+  e.preventDefault();
+}, { passive: false });
+
 // Carrega os dados
 carregarPlacares();
 setInterval(carregarPlacares, 30000);
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('../sw.js');
+}
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('../sw.js');
