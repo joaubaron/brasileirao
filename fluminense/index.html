@@ -188,10 +188,18 @@ const _BASE  = 'https://api.football-data.org/v4';
 const _PROXY = 'https://corsproxy.io/?url=';
 
 async function _fetchAPI(endpoint) {
-  try {
-    const r = await fetch(_PROXY + encodeURIComponent(_BASE + endpoint), {headers:{'X-Auth-Token':_TOKEN}});
-    return r.ok ? await r.json() : null;
-  } catch(e) { return null; }
+  const url = _BASE + endpoint;
+  const proxies = [
+    'https://corsproxy.io/?url=' + encodeURIComponent(url),
+    'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+  ];
+  for (const proxy of proxies) {
+    try {
+      const r = await fetch(proxy, {headers:{'X-Auth-Token':_TOKEN}});
+      if (r.ok) return await r.json();
+    } catch(e) {}
+  }
+  return null;
 }
 
 async function _placar(teamId, elId, fallback) {
@@ -207,17 +215,29 @@ async function _placar(teamId, elId, fallback) {
       return;
     }
   }
-  const nxt = await _fetchAPI('/teams/' + teamId + '/matches?status=SCHEDULED&limit=5');
-  if (nxt && nxt.matches) {
-    const fut = nxt.matches.filter(x => new Date(x.utcDate) > new Date()).sort((a,b)=>new Date(a.utcDate)-new Date(b.utcDate));
-    if (fut.length) {
-      const m = fut[0];
-      const d = new Date(m.utcDate);
-      const h = d.getUTCHours()-3; const ha = h<0?h+24:h;
-      const min = d.getUTCMinutes().toString().padStart(2,'0');
-      el.textContent = '📅 ' + d.getUTCDate()+'/'+(d.getUTCMonth()+1)+' '+ha+'h'+min+'\n'+m.homeTeam.shortName+' × '+m.awayTeam.shortName;
-      return;
+  // Próximo agendado (SCHEDULED ou TIMED)
+  for (const status of ['SCHEDULED', 'TIMED']) {
+    const nxt = await _fetchAPI('/teams/' + teamId + '/matches?status=' + status + '&limit=5');
+    if (nxt && nxt.matches && nxt.matches.length) {
+      const fut = nxt.matches.filter(x => new Date(x.utcDate) > new Date()).sort((a,b)=>new Date(a.utcDate)-new Date(b.utcDate));
+      if (fut.length) {
+        const m = fut[0];
+        const d = new Date(m.utcDate);
+        const h = d.getUTCHours()-3; const ha = h<0?h+24:h;
+        const min = d.getUTCMinutes().toString().padStart(2,'0');
+        el.textContent = '📅 ' + d.getUTCDate()+'/'+(d.getUTCMonth()+1)+' '+ha+'h'+min+'\n'+m.homeTeam.shortName+' × '+m.awayTeam.shortName;
+        return;
+      }
     }
+  }
+  // Último jogo finalizado como fallback
+  const last = await _fetchAPI('/teams/' + teamId + '/matches?status=FINISHED&limit=1');
+  if (last && last.matches && last.matches.length) {
+    const m = last.matches[last.matches.length-1];
+    const home = m.score?.fullTime?.home ?? 0;
+    const away = m.score?.fullTime?.away ?? 0;
+    el.textContent = '✅ ' + m.homeTeam.shortName + ' ' + home + 'x' + away + ' ' + m.awayTeam.shortName;
+    return;
   }
   el.textContent = fallback;
 }
