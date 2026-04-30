@@ -70,4 +70,5 @@ Adicionar 3 linhas no array `ASSETS`:
 
 ```
 https://joaubaron.github.io/brasileirao/vasco/
+https://rapid-pine-1fe3.jabaron.workers.dev/fluminense
 ```
