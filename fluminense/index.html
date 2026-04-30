@@ -156,9 +156,55 @@ color: rgba(255,255,255,0.6);
 font-size: 0.7rem;
 padding: 10px;
 }
+
+/* === PULL-TO-REFRESH === */
+#ptr-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.12);
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+  transition: height 0.2s ease;
+  z-index: 999;
+  backdrop-filter: blur(4px);
+}
+#ptr-bar.show { height: 48px; }
+#ptr-arrow {
+  display: inline-block;
+  font-size: 18px;
+  transition: transform 0.25s ease;
+  line-height: 1;
+}
+#ptr-arrow.flip { transform: rotate(180deg); }
+#ptr-spinner {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: ptr-spin 0.7s linear infinite;
+  display: none;
+}
+@keyframes ptr-spin { to { transform: rotate(360deg); } }
+#ptr-bar.loading #ptr-spinner { display: block; }
+#ptr-bar.loading #ptr-arrow { display: none; }
 </style>
 </head>
 <body>
+
+<!-- PULL-TO-REFRESH BAR -->
+<div id="ptr-bar">
+  <span id="ptr-arrow">↓</span>
+  <div id="ptr-spinner"></div>
+  <span id="ptr-label">Puxe para atualizar</span>
+</div>
+
 <div class="card">
 <img src="../bola.png" alt="Brasileirão" class="logo">
 <a href="#" class="btn" id="verBtn">Campeonatos, jogos e resultados ⚽</a>
@@ -182,61 +228,41 @@ padding: 10px;
 const googleUrl = "https://www.espn.com.br/futebol/classificacao";
 const meutimeUrl = "https://www.fluminense.com.br/site/";
 
-// SEU WORKER URL - SUBSTITUA PELA SUA URL DO CLOUDFLARE WORKER
 const WORKER_URL = "https://rapid-pine-1fe3.jabaron.workers.dev";
 const TIME_FLUMINENSE_ID = 1783;
 
 async function buscarJogoFluminenseReal() {
   try {
-    const response = await fetch(`${WORKER_URL}/fluminense`, {
-  cache: "no-store"
-});
+    const response = await fetch(`${WORKER_URL}/fluminense`, { cache: "no-store" });
     const data = await response.json();
 
-    if (!data.matches || data.matches.length === 0) {
-      return { temJogo: false };
-    }
+    if (!data.matches || data.matches.length === 0) return { temJogo: false };
 
-    // Filtra jogos do Fluminense (nome pode variar: "Fluminense" ou "Fluminense FC")
-    const ehFluminense = (nome) =>
-      nome && nome.toLowerCase().includes("fluminense");
-
+    const ehFluminense = (nome) => nome && nome.toLowerCase().includes("fluminense");
     const jogosFluminense = data.matches.filter(
       (m) => ehFluminense(m.homeTeam?.name) || ehFluminense(m.awayTeam?.name)
     );
 
     if (jogosFluminense.length === 0) return { temJogo: false };
 
-    // Jogo AO VIVO?
     const jogoAoVivo = jogosFluminense.find((m) =>
       ["LIVE", "IN_PLAY", "PAUSED"].includes(m.status)
     );
 
     if (jogoAoVivo) {
-      const ehMandante = ehFluminense(jogoAoVivo.homeTeam?.name);
       const golsCasa = jogoAoVivo.score?.fullTime?.home ?? jogoAoVivo.score?.halfTime?.home ?? 0;
       const golsFora = jogoAoVivo.score?.fullTime?.away ?? jogoAoVivo.score?.halfTime?.away ?? 0;
-
-      let tempo = "";
-      if (jogoAoVivo.status === "PAUSED") {
-        tempo = "⏸️ Intervalo";
-      } else {
-        tempo = jogoAoVivo.minute ? `${jogoAoVivo.minute}'` : "Em andamento";
-      }
-
+      let tempo = jogoAoVivo.status === "PAUSED" ? "⏸️ Intervalo"
+        : jogoAoVivo.minute ? `${jogoAoVivo.minute}'` : "Em andamento";
       return {
-        temJogo: true,
-        aoVivo: true,
+        temJogo: true, aoVivo: true,
         mandante: jogoAoVivo.homeTeam?.name,
         visitante: jogoAoVivo.awayTeam?.name,
-        golsMandante: golsCasa,
-        golsVisitante: golsFora,
-        tempo,
-        competicao: jogoAoVivo.competition?.name || "",
+        golsMandante: golsCasa, golsVisitante: golsFora,
+        tempo, competicao: jogoAoVivo.competition?.name || "",
       };
     }
 
-    // Próximo jogo agendado
     const agora = new Date();
     const proximo = jogosFluminense
       .filter((m) => ["SCHEDULED", "TIMED"].includes(m.status))
@@ -251,10 +277,8 @@ async function buscarJogoFluminenseReal() {
       const hora = `${d.getHours().toString().padStart(2,"0")}:${d.getMinutes().toString().padStart(2,"0")}`;
       const ehMandante = ehFluminense(proximo.homeTeam?.name);
       const adversario = ehMandante ? proximo.awayTeam?.name : proximo.homeTeam?.name;
-
       return {
-        temJogo: true,
-        aoVivo: false,
+        temJogo: true, aoVivo: false,
         proximo: ehMandante ? `Fluminense x ${adversario}` : `${adversario} x Fluminense`,
         data: `${dias[d.getDay()]} • ${hora}`,
         dataCompleta: `${d.getDate()} de ${meses[d.getMonth()]}`,
@@ -263,7 +287,6 @@ async function buscarJogoFluminenseReal() {
       };
     }
 
-    // Nenhum jogo futuro — mostra último resultado
     if (data.ultimo) {
       const u = data.ultimo;
       const ehMandante = ehFluminense(u.homeTeam?.name);
@@ -272,11 +295,8 @@ async function buscarJogoFluminenseReal() {
       const golsAdv = ehMandante ? u.score?.fullTime?.away : u.score?.fullTime?.home;
       const d = new Date(u.utcDate);
       const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
-
       return {
-        temJogo: true,
-        aoVivo: false,
-        encerrado: true,
+        temJogo: true, aoVivo: false, encerrado: true,
         proximo: ehMandante
           ? `Fluminense ${golsFlu} x ${golsAdv} ${adversario}`
           : `${adversario} ${golsAdv} x ${golsFlu} Fluminense`,
@@ -297,43 +317,36 @@ async function buscarJogoFluminenseReal() {
 function atualizarPlacarFluminense(dados) {
     const container = document.getElementById('placarFluminense');
     if (!container) return;
-    
     if (dados.erro) {
         container.innerHTML = `
             <div class="placar-titulo">FLUMINENSE</div>
             <div class="placar-status sem-jogo">⚠️ Erro ao carregar</div>
-            <div class="placar-info">Tente novamente</div>
-        `;
+            <div class="placar-info">Tente novamente</div>`;
         return;
     }
-    
     if (dados.temJogo && dados.aoVivo) {
         container.innerHTML = `
             <div class="placar-titulo">FLUMINENSE</div>
             <div class="placar-status ao-vivo">🔴 AO VIVO</div>
             <div class="placar-jogo">${dados.mandante} ${dados.golsMandante} x ${dados.golsVisitante} ${dados.visitante}</div>
             <div class="placar-info">${dados.tempo}</div>
-            <div class="placar-info" style="font-size:0.65rem">🏆 ${dados.competicao}</div>
-        `;
+            <div class="placar-info" style="font-size:0.65rem">🏆 ${dados.competicao}</div>`;
     } else if (dados.temJogo && !dados.aoVivo) {
         const icone = dados.encerrado ? "🏁" : "🗓️";
         const corStatus = dados.encerrado ? "#aaaaaa" : "#ffaa44";
         const labelStatus = dados.encerrado ? "Jogo encerrado" : "⚽ Nenhum jogo ao vivo";
-
         container.innerHTML = `
             <div class="placar-titulo">FLUMINENSE</div>
             <div class="placar-status sem-jogo" style="color:${corStatus}">${labelStatus}</div>
             <div class="placar-info" style="font-weight:bold">${icone} ${dados.proximo}</div>
             <div class="placar-info">${dados.dataCompleta}</div>
             <div class="proximo-jogo">${dados.data} • ${dados.local}</div>
-            <div class="placar-info" style="font-size:0.65rem;margin-top:4px">🏆 ${dados.competicao}</div>
-        `;
+            <div class="placar-info" style="font-size:0.65rem;margin-top:4px">🏆 ${dados.competicao}</div>`;
     } else {
         container.innerHTML = `
             <div class="placar-titulo">FLUMINENSE</div>
             <div class="placar-status sem-jogo">⚽ Nenhum jogo programado</div>
-            <div class="placar-info">Verifique calendário oficial</div>
-        `;
+            <div class="placar-info">Verifique calendário oficial</div>`;
     }
 }
 
@@ -344,40 +357,88 @@ async function carregarPlacares() {
     const container = document.getElementById('placarFluminense');
     container.innerHTML = `
       <div class="placar-titulo">FLUMINENSE</div>
-      <div class="loading">⏳ Buscando dados...</div>
-    `;
+      <div class="loading">⏳ Buscando dados...</div>`;
   }
   const fluminense = await buscarJogoFluminenseReal();
   atualizarPlacarFluminense(fluminense);
   primeiraVez = false;
 }
 
+// === PULL-TO-REFRESH ===
+(function () {
+  const THRESHOLD = 65;
+  let startY = 0, pulling = false, triggered = false;
+  const bar   = document.getElementById('ptr-bar');
+  const arrow = document.getElementById('ptr-arrow');
+  const label = document.getElementById('ptr-label');
+
+  function reset() {
+    bar.classList.remove('show', 'loading');
+    arrow.classList.remove('flip');
+    label.textContent = 'Puxe para atualizar';
+    triggered = false;
+  }
+
+  async function doRefresh() {
+    bar.classList.add('show', 'loading');
+    label.textContent = 'Atualizando...';
+    await carregarPlacares();
+    reset();
+  }
+
+  document.addEventListener('touchstart', (e) => {
+    startY = e.touches[0].clientY;
+    pulling = true;
+    triggered = false;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (!pulling) return;
+    const dy = e.touches[0].clientY - startY;
+    if (dy > 10) {
+      e.preventDefault();           // bloqueia scroll só quando está puxando pra baixo
+      bar.classList.add('show');
+      if (dy >= THRESHOLD) {
+        arrow.classList.add('flip');
+        label.textContent = 'Solte para atualizar';
+        triggered = true;
+      } else {
+        arrow.classList.remove('flip');
+        label.textContent = 'Puxe para atualizar';
+        triggered = false;
+      }
+    }
+  }, { passive: false });
+
+  document.addEventListener('touchend', () => {
+    if (!pulling) return;
+    pulling = false;
+    if (triggered) {
+      doRefresh();
+    } else {
+      reset();
+    }
+  }, { passive: true });
+})();
+// === FIM PULL-TO-REFRESH ===
+
 // Eventos dos botões
-document.getElementById('verBtn').addEventListener('click', function(e) {
+document.getElementById('verBtn').addEventListener('click', function() {
     window.location.href = googleUrl;
 });
-document.getElementById('meutimeBtn').addEventListener('click', function(e) {
+document.getElementById('meutimeBtn').addEventListener('click', function() {
     window.location.href = meutimeUrl;
 });
-document.getElementById('brasilBtn').addEventListener('click', function(e) {
+document.getElementById('brasilBtn').addEventListener('click', function() {
     window.location.href = "https://www.cbf.com.br/";
 });
-document.getElementById('becBtn').addEventListener('click', function(e) {
+document.getElementById('becBtn').addEventListener('click', function() {
     window.location.href = "https://www.becsaf.com.br/";
 });
-
-// Bloqueia scroll por toque
-document.addEventListener('touchmove', function(e) {
-  e.preventDefault();
-}, { passive: false });
 
 // Carrega os dados
 carregarPlacares();
 setInterval(carregarPlacares, 30000);
-
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('../sw.js');
-}
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('../sw.js');
