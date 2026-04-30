@@ -322,14 +322,14 @@ function atualizarPlacarFluminense(dados) {
     if (!container) return;
     if (dados.erro) {
         container.innerHTML = `
-            <div class="placar-titulo"><img src="meutime.png" alt="" style="width:16px;height:16px;border-radius:4px;vertical-align:middle;margin-right:6px;position:relative;top:-1px">FLUMINENSE</div>
+            <div class="placar-titulo"><img src="fluzao.png" alt="" style="width:16px;height:16px;border-radius:4px;vertical-align:middle;margin-right:6px;position:relative;top:-1px">FLUMINENSE</div>
             <div class="placar-status sem-jogo">⚠️ Erro ao carregar</div>
             <div class="placar-info">Tente novamente</div>`;
         return;
     }
     if (dados.temJogo && dados.aoVivo) {
         container.innerHTML = `
-            <div class="placar-titulo"><img src="meutime.png" alt="" style="width:16px;height:16px;border-radius:4px;vertical-align:middle;margin-right:6px;position:relative;top:-1px">FLUMINENSE</div>
+            <div class="placar-titulo"><img src="fluzao.png" alt="" style="width:16px;height:16px;border-radius:4px;vertical-align:middle;margin-right:6px;position:relative;top:-1px">FLUMINENSE</div>
             <div class="placar-status ao-vivo">🔴 AO VIVO</div>
             <div class="placar-jogo">${dados.mandante} ${dados.golsMandante} x ${dados.golsVisitante} ${dados.visitante}</div>
             <div class="placar-info">${dados.tempo}</div>
@@ -339,7 +339,7 @@ function atualizarPlacarFluminense(dados) {
         const corStatus = dados.encerrado ? "#aaaaaa" : "#ffaa44";
         const labelStatus = dados.encerrado ? "Jogo encerrado" : "⚽ Nenhum jogo ao vivo";
         container.innerHTML = `
-            <div class="placar-titulo"><img src="meutime.png" alt="" style="width:16px;height:16px;border-radius:4px;vertical-align:middle;margin-right:6px;position:relative;top:-1px">FLUMINENSE</div>
+            <div class="placar-titulo"><img src="fluzao.png" alt="" style="width:16px;height:16px;border-radius:4px;vertical-align:middle;margin-right:6px;position:relative;top:-1px">FLUMINENSE</div>
             <div class="placar-status sem-jogo" style="color:${corStatus}">${labelStatus}</div>
             <div class="placar-info" style="font-weight:bold">${icone} ${dados.proximo}</div>
             <div class="placar-info">${dados.dataCompleta}</div>
@@ -347,7 +347,7 @@ function atualizarPlacarFluminense(dados) {
             <div class="placar-info" style="font-size:0.65rem;margin-top:4px">🏆 ${dados.competicao}</div>`;
     } else {
         container.innerHTML = `
-            <div class="placar-titulo"><img src="meutime.png" alt="" style="width:16px;height:16px;border-radius:4px;vertical-align:middle;margin-right:6px;position:relative;top:-1px">FLUMINENSE</div>
+            <div class="placar-titulo"><img src="fluzao.png" alt="" style="width:16px;height:16px;border-radius:4px;vertical-align:middle;margin-right:6px;position:relative;top:-1px">FLUMINENSE</div>
             <div class="placar-status sem-jogo">⚽ Nenhum jogo programado</div>
             <div class="placar-info">Verifique calendário oficial</div>`;
     }
