@@ -93,7 +93,7 @@ position: relative;
 bottom: 2px;
 }
 
-/* PLACARES LADO A LADO - MESMA LINHA */
+/* PLACARES LADO A LADO - MESMA LINHA - SEM WRAP */
 .placares-wrapper {
 display: flex;
 flex-direction: row;
@@ -102,7 +102,7 @@ align-items: stretch;
 gap: 15px;
 margin-top: 20px;
 width: 100%;
-flex-wrap: wrap;
+/* REMOVI O flex-wrap: wrap */
 }
 
 .placar-card {
@@ -168,9 +168,7 @@ padding: 10px;
 <div class="card">
 <img src="../bola.png" alt="Brasileirão" class="logo">
 <br><br>
-<p style="color: white; font-size: 14px; font-weight: 500;">Campeonatos, jogos e resultados 🏆</p>
-<a href="#" class="btn" id="verBtn">Ver Classificação 🌟</a>
-<br><br>
+<a href="#" class="btn" id="verBtn">Campeonatos, jogos e resultados ⚽</a>
 
 <div class="logos-container">
 <img src="meutime.png" alt="meutime" class="time-logo" id="meutimeBtn">
