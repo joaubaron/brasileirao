@@ -275,7 +275,7 @@ function atualizarPlacarFluminense(dados) {
     
     if (dados.erro) {
         container.innerHTML = `
-            <div class="placar-titulo">🇭🇺 FLUMINENSE</div>
+            <div class="placar-titulo">FLUMINENSE</div>
             <div class="placar-status sem-jogo">⚠️ Erro ao carregar</div>
             <div class="placar-info">Tente novamente</div>
         `;
@@ -284,7 +284,7 @@ function atualizarPlacarFluminense(dados) {
     
     if (dados.temJogo && dados.aoVivo) {
         container.innerHTML = `
-            <div class="placar-titulo">🇭🇺 FLUMINENSE</div>
+            <div class="placar-titulo">FLUMINENSE</div>
             <div class="placar-status ao-vivo">🔴 AO VIVO</div>
             <div class="placar-jogo">${dados.mandante} ${dados.golsMandante} x ${dados.golsVisitante} ${dados.visitante}</div>
             <div class="placar-info">${dados.tempo}</div>
@@ -292,7 +292,7 @@ function atualizarPlacarFluminense(dados) {
         `;
     } else if (dados.temJogo && !dados.aoVivo) {
         container.innerHTML = `
-            <div class="placar-titulo">🇭🇺 FLUMINENSE</div>
+            <div class="placar-titulo">FLUMINENSE</div>
             <div class="placar-status sem-jogo">⚽ Nenhum jogo ao vivo</div>
             <div class="placar-info" style="font-weight:bold">Próximo: ${dados.proximo}</div>
             <div class="placar-info">${dados.dataCompleta}</div>
@@ -301,7 +301,7 @@ function atualizarPlacarFluminense(dados) {
         `;
     } else {
         container.innerHTML = `
-            <div class="placar-titulo">🇭🇺 FLUMINENSE</div>
+            <div class="placar-titulo">FLUMINENSE</div>
             <div class="placar-status sem-jogo">⚽ Nenhum jogo programado</div>
             <div class="placar-info">Verifique calendário oficial</div>
         `;
@@ -314,7 +314,7 @@ async function carregarPlacares() {
   if (primeiraVez) {
     const container = document.getElementById('placarFluminense');
     container.innerHTML = `
-      <div class="placar-titulo">🇭🇺 FLUMINENSE</div>
+      <div class="placar-titulo">FLUMINENSE</div>
       <div class="loading">⏳ Buscando dados...</div>
     `;
   }
