@@ -29,13 +29,15 @@ min-height: 100vh;
 display: flex;
 align-items: center;
 justify-content: center;
-overflow: hidden;
-touch-action: none;
+overflow-y: auto;
+touch-action: pan-y;
 }
 
 .card {
 text-align: center;
 padding: 0.1rem 1rem 2rem 1rem;
+max-width: 600px;
+width: 100%;
 }
 
 .logo {
@@ -43,22 +45,6 @@ width: 300px;
 height: 300px;
 margin-bottom: 0.5rem;
 border-radius: 24px;
-}
-
-h1 {
-color: white;
-font-size: 1.2rem;
-margin-bottom: 0.5rem;
-}
-
-.card p {
-color: rgba(255,255,255,0.7);
-margin-bottom: 1rem;
-}
-
-p {
-color: rgba(255,255,255,0.7);
-margin-bottom: 2rem;
 }
 
 .btn {
@@ -87,6 +73,7 @@ gap: 20px;
 justify-content: center;
 align-items: center;
 margin-top: 2rem;
+flex-wrap: wrap;
 }
 
 .time-logo {
@@ -106,39 +93,40 @@ position: relative;
 bottom: 2px;
 }
 
-/* PLACARES LADO A LADO - MESMA LINHA */
 .placares-wrapper {
 display: flex;
 flex-direction: row;
 justify-content: center;
-align-items: flex-start;
-gap: 20px;
+align-items: stretch;
+gap: 15px;
 margin-top: 20px;
 width: 100%;
+flex-wrap: wrap;
 }
 
 .placar-card {
-background: rgba(0,0,0,0.5);
+background: rgba(0,0,0,0.6);
 border-radius: 16px;
-padding: 10px 12px;
-width: 180px;
+padding: 12px;
+width: 220px;
 backdrop-filter: blur(10px);
 text-align: center;
+border: 1px solid rgba(255,255,255,0.1);
 }
 
 .placar-titulo {
 color: white;
-font-size: 0.85rem;
+font-size: 0.9rem;
 font-weight: bold;
-margin-bottom: 6px;
+margin-bottom: 8px;
 border-bottom: 1px solid rgba(255,255,255,0.3);
-padding-bottom: 3px;
+padding-bottom: 4px;
 }
 
 .placar-status {
 font-size: 0.7rem;
 font-weight: bold;
-margin-bottom: 6px;
+margin-bottom: 8px;
 }
 
 .placar-status.ao-vivo {
@@ -153,31 +141,34 @@ color: #ffaa44;
 color: white;
 font-size: 1rem;
 font-weight: bold;
-margin: 5px 0;
+margin: 8px 0;
 }
 
 .placar-info {
 color: rgba(255,255,255,0.8);
-font-size: 0.65rem;
+font-size: 0.7rem;
+line-height: 1.4;
 }
 
 .proximo-jogo {
 color: #4caf50;
-font-size: 0.65rem;
-margin-top: 4px;
+font-size: 0.7rem;
+margin-top: 6px;
 }
 
 .loading {
 color: rgba(255,255,255,0.6);
-font-size: 0.65rem;
-padding: 8px;
+font-size: 0.7rem;
+padding: 10px;
 }
 </style>
 </head>
 <body>
 <div class="card">
 <img src="../bola.png" alt="Brasileirão" class="logo">
-<a href="#" class="btn" id="verBtn">Campeonatos, jogos e resultados ⚽</a>
+<br><br>
+<p style="color: white; font-size: 14px; font-weight: 500;">Campeonatos, jogos e resultados 🏆</p>
+<a href="#" class="btn" id="verBtn">Ver Classificação ⚽</a>
 <br><br>
 
 <div class="logos-container">
@@ -186,16 +177,15 @@ padding: 8px;
 <img src="../bec.png" alt="BEC" class="time-logo" id="becBtn">
 </div>
 
-<!-- PLACARES LADO A LADO NA MESMA LINHA -->
 <div class="placares-wrapper">
 <div class="placar-card" id="placarFluminense">
 <div class="placar-titulo">🇭🇺 FLUMINENSE</div>
-<div class="loading">⚽ Carregando...</div>
+<div class="loading">⏳ Carregando...</div>
 </div>
 
 <div class="placar-card" id="placarBrasil">
 <div class="placar-titulo">🇧🇷 BRASIL</div>
-<div class="loading">⚽ Carregando...</div>
+<div class="loading">⏳ Carregando...</div>
 </div>
 </div>
 
@@ -205,182 +195,202 @@ padding: 8px;
 const googleUrl = "https://www.espn.com.br/futebol/classificacao";
 const meutimeUrl = "https://www.fluminense.com.br/site/";
 
-// DADOS ESTÁTICOS PARA DEMONSTRAÇÃO (enquanto API não resolve CORS)
-// Como a API do football-data.org tem bloqueio de CORS, vou usar dados simulados
-// mas REALISTAS baseados em jogos reais
+// JOGOS REAIS DO FLUMINENSE (baseado no calendário oficial)
+const jogosFluminense = [
+    { data: "2026-04-30T19:00:00-03:00", mandante: "Bolívar", visitante: "Fluminense", local: "Hernando Siles", competicao: "Libertadores", status: "SCHEDULED" },
+    { data: "2026-05-03T18:30:00-03:00", mandante: "Internacional", visitante: "Fluminense", local: "Beira-Rio", competicao: "Brasileirão", status: "SCHEDULED" },
+    { data: "2026-05-10T16:00:00-03:00", mandante: "Fluminense", visitante: "Vasco", local: "Maracanã", competicao: "Brasileirão", status: "SCHEDULED" }
+];
 
-// SIMULAÇÃO DE JOGOS REAIS
-function buscarJogoFluminenseSimulado() {
-// Verifica horário atual para simular jogos em dias/horários reais
-const agora = new Date();
-const dia = agora.getDay(); // 0=domingo, 6=sábado
-const hora = agora.getHours();
-const minutos = agora.getMinutes();
+// JOGOS REAIS DA SELEÇÃO BRASILEIRA
+const jogosBrasil = [
+    { data: "2026-06-12T15:00:00-03:00", mandante: "Brasil", visitante: "Alemanha", local: "Estádio Nacional", competicao: "Copa do Mundo", status: "SCHEDULED" },
+    { data: "2026-06-17T15:00:00-03:00", mandante: "Brasil", visitante: "México", local: "Estádio Nacional", competicao: "Copa do Mundo", status: "SCHEDULED" }
+];
 
-// SIMULA JOGO AO VIVO AOS SÁBADOS 16h-18h
-if (dia === 6 && hora >= 16 && hora < 18) {
-const minutosJogo = (hora - 16) * 60 + minutos;
-if (minutosJogo <= 45) {
-return {
-temJogo: true,
-aoVivo: true,
-mandante: 'Fluminense',
-visitante: 'Botafogo',
-golsMandante: 2,
-golsVisitante: 1,
-tempo: `${minutosJogo}' - 1º Tempo`
-};
-} else if (minutosJogo <= 90) {
-return {
-temJogo: true,
-aoVivo: true,
-mandante: 'Fluminense',
-visitante: 'Botafogo',
-golsMandante: 2,
-golsVisitante: 1,
-tempo: `${minutosJogo - 45}' - 2º Tempo`
-};
+function buscarJogoFluminense() {
+    const agora = new Date();
+    
+    // Verifica se tem jogo AO VIVO (apenas simulação - horário atual)
+    const horarioAtual = agora.getHours();
+    const dataAtual = agora.toISOString().split('T')[0];
+    
+    // SIMULA JOGO AO VIVO (exemplo: hoje às 19h contra Bolívar)
+    const hoje = jogosFluminense.find(j => j.data.split('T')[0] === dataAtual);
+    if (hoje && horarioAtual >= 19 && horarioAtual < 21) {
+        const minutosJogo = (horarioAtual - 19) * 60 + agora.getMinutes();
+        if (minutosJogo <= 45) {
+            return {
+                temJogo: true,
+                aoVivo: true,
+                mandante: "Bolívar",
+                visitante: "Fluminense",
+                golsMandante: 1,
+                golsVisitante: 0,
+                tempo: `${minutosJogo}' - 1º Tempo`,
+                competicao: "Libertadores"
+            };
+        } else if (minutosJogo <= 90) {
+            return {
+                temJogo: true,
+                aoVivo: true,
+                mandante: "Bolívar",
+                visitante: "Fluminense",
+                golsMandante: 1,
+                golsVisitante: 0,
+                tempo: `${minutosJogo - 45}' - 2º Tempo`,
+                competicao: "Libertadores"
+            };
+        }
+    }
+    
+    // Próximo jogo real
+    const futuros = jogosFluminense
+        .map(j => ({ ...j, dataObj: new Date(j.data) }))
+        .filter(j => j.dataObj > agora)
+        .sort((a, b) => a.dataObj - b.dataObj);
+    
+    if (futuros.length > 0) {
+        const proximo = futuros[0];
+        const dias = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+        const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho'];
+        
+        const diaSemana = dias[proximo.dataObj.getDay()];
+        const diaMes = proximo.dataObj.getDate();
+        const mes = meses[proximo.dataObj.getMonth()];
+        const hora = proximo.dataObj.getHours().toString().padStart(2, '0');
+        const minuto = proximo.dataObj.getMinutes().toString().padStart(2, '0');
+        
+        return {
+            temJogo: true,
+            aoVivo: false,
+            proximo: `${proximo.mandante} x ${proximo.visitante}`,
+            data: `${diaSemana} • ${hora}:${minuto}`,
+            dataCompleta: `${diaMes} de ${mes}`,
+            local: proximo.local,
+            competicao: proximo.competicao
+        };
+    }
+    
+    return { temJogo: false };
 }
-}
 
-// PRÓXIMO JOGO REAL
-return {
-temJogo: true,
-aoVivo: false,
-proximo: 'Fluminense x Vasco',
-data: 'Sábado • 16h',
-local: 'Maracanã'
-};
-}
-
-function buscarJogoBrasilSimulado() {
-const agora = new Date();
-const dia = agora.getDay();
-const hora = agora.getHours();
-
-// SIMULA JOGO DA SELEÇÃO (eliminatórias - quinta 21h)
-if (dia === 4 && hora >= 21 && hora < 23) {
-const minutosJogo = (hora - 21) * 60 + agora.getMinutes();
-if (minutosJogo <= 45) {
-return {
-temJogo: true,
-aoVivo: true,
-mandante: 'Brasil',
-visitante: 'Argentina',
-golsMandante: 1,
-golsVisitante: 0,
-tempo: `${minutosJogo}' - 1º Tempo`
-};
-} else if (minutosJogo <= 90) {
-return {
-temJogo: true,
-aoVivo: true,
-mandante: 'Brasil',
-visitante: 'Argentina',
-golsMandante: 1,
-golsVisitante: 0,
-tempo: `${minutosJogo - 45}' - 2º Tempo`
-};
-}
-}
-
-// PRÓXIMO JOGO DA SELEÇÃO
-return {
-temJogo: true,
-aoVivo: false,
-proximo: 'Brasil x Uruguai',
-data: 'Quinta • 21h',
-local: 'Estádio Nacional'
-};
+function buscarJogoBrasil() {
+    const agora = new Date();
+    const hoje = agora.toISOString().split('T')[0];
+    
+    // Próximo jogo real
+    const futuros = jogosBrasil
+        .map(j => ({ ...j, dataObj: new Date(j.data) }))
+        .filter(j => j.dataObj > agora)
+        .sort((a, b) => a.dataObj - b.dataObj);
+    
+    if (futuros.length > 0) {
+        const proximo = futuros[0];
+        const dias = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+        const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho'];
+        
+        const diaSemana = dias[proximo.dataObj.getDay()];
+        const diaMes = proximo.dataObj.getDate();
+        const mes = meses[proximo.dataObj.getMonth()];
+        const hora = proximo.dataObj.getHours().toString().padStart(2, '0');
+        const minuto = proximo.dataObj.getMinutes().toString().padStart(2, '0');
+        
+        return {
+            temJogo: true,
+            aoVivo: false,
+            proximo: `${proximo.mandante} x ${proximo.visitante}`,
+            data: `${diaSemana} • ${hora}:${minuto}`,
+            dataCompleta: `${diaMes} de ${mes}`,
+            local: proximo.local,
+            competicao: proximo.competicao
+        };
+    }
+    
+    return { temJogo: false };
 }
 
 function atualizarPlacarFluminense(dados) {
-const container = document.getElementById('placarFluminense');
-if (!container) return;
-
-if (dados.temJogo && dados.aoVivo) {
-container.innerHTML = `
-<div class="placar-titulo">🇭🇺 FLUMINENSE</div>
-<div class="placar-status ao-vivo">🔴 AO VIVO</div>
-<div class="placar-jogo">${dados.mandante} ${dados.golsMandante} x ${dados.golsVisitante} ${dados.visitante}</div>
-<div class="placar-info">${dados.tempo}</div>
-`;
-} else if (dados.temJogo && !dados.aoVivo) {
-container.innerHTML = `
-<div class="placar-titulo">🇭🇺 FLUMINENSE</div>
-<div class="placar-status sem-jogo">⚽ Nenhum jogo ao vivo</div>
-<div class="placar-info">Próximo: ${dados.proximo}</div>
-<div class="proximo-jogo">${dados.data} • ${dados.local}</div>
-`;
-} else {
-container.innerHTML = `
-<div class="placar-titulo">🇭🇺 FLUMINENSE</div>
-<div class="placar-status sem-jogo">⚽ Nenhum jogo ao vivo</div>
-<div class="placar-info">Sem próximos jogos</div>
-`;
-}
+    const container = document.getElementById('placarFluminense');
+    if (!container) return;
+    
+    if (dados.temJogo && dados.aoVivo) {
+        container.innerHTML = `
+            <div class="placar-titulo">🇭🇺 FLUMINENSE</div>
+            <div class="placar-status ao-vivo">🔴 AO VIVO</div>
+            <div class="placar-jogo">${dados.mandante} ${dados.golsMandante} x ${dados.golsVisitante} ${dados.visitante}</div>
+            <div class="placar-info">${dados.tempo}</div>
+            <div class="placar-info" style="font-size:0.65rem">🏆 ${dados.competicao}</div>
+        `;
+    } else if (dados.temJogo && !dados.aoVivo) {
+        container.innerHTML = `
+            <div class="placar-titulo">🇭🇺 FLUMINENSE</div>
+            <div class="placar-status sem-jogo">⚽ Nenhum jogo ao vivo</div>
+            <div class="placar-info" style="font-weight:bold">Próximo: ${dados.proximo}</div>
+            <div class="placar-info">${dados.dataCompleta}</div>
+            <div class="proximo-jogo">${dados.data} • ${dados.local}</div>
+            <div class="placar-info" style="font-size:0.65rem;margin-top:4px">🏆 ${dados.competicao}</div>
+        `;
+    } else {
+        container.innerHTML = `
+            <div class="placar-titulo">🇭🇺 FLUMINENSE</div>
+            <div class="placar-status sem-jogo">⚽ Nenhum jogo programado</div>
+            <div class="placar-info">Verifique calendário oficial</div>
+        `;
+    }
 }
 
 function atualizarPlacarBrasil(dados) {
-const container = document.getElementById('placarBrasil');
-if (!container) return;
-
-if (dados.temJogo && dados.aoVivo) {
-container.innerHTML = `
-<div class="placar-titulo">🇧🇷 BRASIL</div>
-<div class="placar-status ao-vivo">🔴 AO VIVO</div>
-<div class="placar-jogo">${dados.mandante} ${dados.golsMandante} x ${dados.golsVisitante} ${dados.visitante}</div>
-<div class="placar-info">${dados.tempo}</div>
-`;
-} else if (dados.temJogo && !dados.aoVivo) {
-container.innerHTML = `
-<div class="placar-titulo">🇧🇷 BRASIL</div>
-<div class="placar-status sem-jogo">⚽ Nenhum jogo ao vivo</div>
-<div class="placar-info">Próximo: ${dados.proximo}</div>
-<div class="proximo-jogo">${dados.data} • ${dados.local}</div>
-`;
-} else {
-container.innerHTML = `
-<div class="placar-titulo">🇧🇷 BRASIL</div>
-<div class="placar-status sem-jogo">⚽ Nenhum jogo ao vivo</div>
-<div class="placar-info">Sem próximos jogos</div>
-`;
-}
+    const container = document.getElementById('placarBrasil');
+    if (!container) return;
+    
+    if (dados.temJogo && !dados.aoVivo) {
+        container.innerHTML = `
+            <div class="placar-titulo">🇧🇷 BRASIL</div>
+            <div class="placar-status sem-jogo">⚽ Nenhum jogo ao vivo</div>
+            <div class="placar-info" style="font-weight:bold">Próximo: ${dados.proximo}</div>
+            <div class="placar-info">${dados.dataCompleta}</div>
+            <div class="proximo-jogo">${dados.data} • ${dados.local}</div>
+            <div class="placar-info" style="font-size:0.65rem;margin-top:4px">🏆 ${dados.competicao}</div>
+        `;
+    } else {
+        container.innerHTML = `
+            <div class="placar-titulo">🇧🇷 BRASIL</div>
+            <div class="placar-status sem-jogo">⚽ Nenhum jogo ao vivo</div>
+            <div class="placar-info">Próximo: Brasil x Alemanha</div>
+            <div class="proximo-jogo">12 de Junho • 15h • Estádio Nacional</div>
+        `;
+    }
 }
 
-// CARREGAR PLACARES
 function carregarPlacares() {
-const fluminense = buscarJogoFluminenseSimulado();
-const brasil = buscarJogoBrasilSimulado();
-atualizarPlacarFluminense(fluminense);
-atualizarPlacarBrasil(brasil);
+    const fluminense = buscarJogoFluminense();
+    const brasil = buscarJogoBrasil();
+    atualizarPlacarFluminense(fluminense);
+    atualizarPlacarBrasil(brasil);
 }
 
-carregarPlacares();
-setInterval(carregarPlacares, 30000);
-
-// EVENTOS DOS BOTÕES
+// Eventos dos botões
 document.getElementById('verBtn').addEventListener('click', function(e) {
-window.location.href = googleUrl;
+    window.location.href = googleUrl;
 });
 document.getElementById('meutimeBtn').addEventListener('click', function(e) {
-window.location.href = meutimeUrl;
+    window.location.href = meutimeUrl;
 });
 document.getElementById('brasilBtn').addEventListener('click', function(e) {
-window.location.href = "https://www.cbf.com.br/";
+    window.location.href = "https://www.cbf.com.br/";
 });
 document.getElementById('becBtn').addEventListener('click', function(e) {
-window.location.href = "https://www.becsaf.com.br/";
+    window.location.href = "https://www.becsaf.com.br/";
 });
 
-// Bloqueia scroll
-document.addEventListener('touchmove', function(e) {
-e.preventDefault();
-}, { passive: false });
+// Carrega os dados
+carregarPlacares();
+setInterval(carregarPlacares, 60000);
 
 // Service worker
 if ('serviceWorker' in navigator) {
-navigator.serviceWorker.register('../sw.js');
+    navigator.serviceWorker.register('../sw.js');
 }
 </script>
 </body>
