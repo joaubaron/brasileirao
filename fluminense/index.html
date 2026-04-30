@@ -93,7 +93,6 @@ position: relative;
 bottom: 2px;
 }
 
-/* APENAS FLUMINENSE - CENTRALIZADO */
 .placar-central {
 display: flex;
 justify-content: center;
@@ -105,7 +104,7 @@ width: 100%;
 background: rgba(0,0,0,0.6);
 border-radius: 16px;
 padding: 12px;
-width: 220px;
+width: 240px;
 backdrop-filter: blur(10px);
 text-align: center;
 border: 1px solid rgba(255,255,255,0.1);
@@ -171,11 +170,10 @@ padding: 10px;
 <img src="../bec.png" alt="BEC" class="time-logo" id="becBtn">
 </div>
 
-<!-- APENAS PLACAR DO FLUMINENSE CENTRALIZADO -->
 <div class="placar-central">
 <div class="placar-card" id="placarFluminense">
 <div class="placar-titulo">🇭🇺 FLUMINENSE</div>
-<div class="loading">⏳ Carregando...</div>
+<div class="loading">⏳ Carregando dados reais...</div>
 </div>
 </div>
 
@@ -185,83 +183,100 @@ padding: 10px;
 const googleUrl = "https://www.espn.com.br/futebol/classificacao";
 const meutimeUrl = "https://www.fluminense.com.br/site/";
 
-// JOGOS REAIS DO FLUMINENSE (baseado no calendário oficial)
-const jogosFluminense = [
-    { data: "2026-04-30T19:00:00-03:00", mandante: "Bolívar", visitante: "Fluminense", local: "Hernando Siles", competicao: "Libertadores", status: "SCHEDULED" },
-    { data: "2026-05-03T18:30:00-03:00", mandante: "Internacional", visitante: "Fluminense", local: "Beira-Rio", competicao: "Brasileirão", status: "SCHEDULED" },
-    { data: "2026-05-10T16:00:00-03:00", mandante: "Fluminense", visitante: "Vasco", local: "Maracanã", competicao: "Brasileirão", status: "SCHEDULED" }
-];
+// SEU WORKER URL - SUBSTITUA PELA SUA URL DO CLOUDFLARE WORKER
+const WORKER_URL = "https://rapid-pine-1fe3.jabaron.workers.dev";
+const TIME_FLUMINENSE_ID = 1783;
 
-function buscarJogoFluminense() {
-    const agora = new Date();
-    
-    // Verifica se tem jogo AO VIVO (apenas simulação - horário atual)
-    const horarioAtual = agora.getHours();
-    const dataAtual = agora.toISOString().split('T')[0];
-    
-    // SIMULA JOGO AO VIVO (exemplo: hoje às 19h contra Bolívar)
-    const hoje = jogosFluminense.find(j => j.data.split('T')[0] === dataAtual);
-    if (hoje && horarioAtual >= 19 && horarioAtual < 21) {
-        const minutosJogo = (horarioAtual - 19) * 60 + agora.getMinutes();
-        if (minutosJogo <= 45) {
+async function buscarJogoFluminenseReal() {
+    try {
+        // Busca jogos do Fluminense via Worker (sem CORS)
+        const url = `${WORKER_URL}/teams/${TIME_FLUMINENSE_ID}/matches?status=LIVE,IN_PLAY,PAUSED,SCHEDULED&limit=10`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (!data.matches || data.matches.length === 0) {
+            return { temJogo: false };
+        }
+        
+        // Procura jogo AO VIVO
+        const jogoAoVivo = data.matches.find(m => 
+            m.status === 'LIVE' || m.status === 'IN_PLAY' || m.status === 'PAUSED'
+        );
+        
+        if (jogoAoVivo) {
+            const golsHome = jogoAoVivo.score?.fullTime?.home ?? jogoAoVivo.score?.halfTime?.home ?? 0;
+            const golsAway = jogoAoVivo.score?.fullTime?.away ?? jogoAoVivo.score?.halfTime?.away ?? 0;
+            
+            let tempo = '';
+            if (jogoAoVivo.status === 'LIVE' || jogoAoVivo.status === 'IN_PLAY') {
+                tempo = `${jogoAoVivo.minute || 0}' - 2º Tempo`;
+            } else if (jogoAoVivo.status === 'PAUSED') {
+                tempo = '⏸️ Intervalo';
+            }
+            
             return {
                 temJogo: true,
                 aoVivo: true,
-                mandante: "Bolívar",
-                visitante: "Fluminense",
-                golsMandante: 1,
-                golsVisitante: 0,
-                tempo: `${minutosJogo}' - 1º Tempo`,
-                competicao: "Libertadores"
-            };
-        } else if (minutosJogo <= 90) {
-            return {
-                temJogo: true,
-                aoVivo: true,
-                mandante: "Bolívar",
-                visitante: "Fluminense",
-                golsMandante: 1,
-                golsVisitante: 0,
-                tempo: `${minutosJogo - 45}' - 2º Tempo`,
-                competicao: "Libertadores"
+                mandante: jogoAoVivo.homeTeam?.name || 'Fluminense',
+                visitante: jogoAoVivo.awayTeam?.name || 'Adversário',
+                golsMandante: golsHome,
+                golsVisitante: golsAway,
+                tempo: tempo,
+                competicao: jogoAoVivo.competition?.name || ''
             };
         }
-    }
-    
-    // Próximo jogo real
-    const futuros = jogosFluminense
-        .map(j => ({ ...j, dataObj: new Date(j.data) }))
-        .filter(j => j.dataObj > agora)
-        .sort((a, b) => a.dataObj - b.dataObj);
-    
-    if (futuros.length > 0) {
-        const proximo = futuros[0];
-        const dias = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
-        const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho'];
         
-        const diaSemana = dias[proximo.dataObj.getDay()];
-        const diaMes = proximo.dataObj.getDate();
-        const mes = meses[proximo.dataObj.getMonth()];
-        const hora = proximo.dataObj.getHours().toString().padStart(2, '0');
-        const minuto = proximo.dataObj.getMinutes().toString().padStart(2, '0');
+        // Próximo jogo
+        const agora = new Date();
+        const proximosJogos = data.matches
+            .filter(m => m.status === 'SCHEDULED' || m.status === 'TIMED')
+            .map(m => ({ ...m, dataObj: new Date(m.utcDate) }))
+            .filter(m => m.dataObj > agora)
+            .sort((a, b) => a.dataObj - b.dataObj);
         
-        return {
-            temJogo: true,
-            aoVivo: false,
-            proximo: `${proximo.mandante} x ${proximo.visitante}`,
-            data: `${diaSemana} • ${hora}:${minuto}`,
-            dataCompleta: `${diaMes} de ${mes}`,
-            local: proximo.local,
-            competicao: proximo.competicao
-        };
+        if (proximosJogos.length > 0) {
+            const proximo = proximosJogos[0];
+            const dataJogo = proximo.dataObj;
+            const dias = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+            const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            
+            const diaSemana = dias[dataJogo.getDay()];
+            const diaMes = dataJogo.getDate();
+            const mes = meses[dataJogo.getMonth()];
+            const hora = dataJogo.getHours().toString().padStart(2, '0');
+            const minuto = dataJogo.getMinutes().toString().padStart(2, '0');
+            
+            return {
+                temJogo: true,
+                aoVivo: false,
+                proximo: `${proximo.homeTeam?.name || 'Time'} x ${proximo.awayTeam?.name || 'Adversário'}`,
+                data: `${diaSemana} • ${hora}:${minuto}`,
+                dataCompleta: `${diaMes} de ${mes}`,
+                local: proximo.venue || 'Estádio',
+                competicao: proximo.competition?.name || ''
+            };
+        }
+        
+        return { temJogo: false };
+        
+    } catch (error) {
+        console.error('Erro:', error);
+        return { temJogo: false, erro: true };
     }
-    
-    return { temJogo: false };
 }
 
 function atualizarPlacarFluminense(dados) {
     const container = document.getElementById('placarFluminense');
     if (!container) return;
+    
+    if (dados.erro) {
+        container.innerHTML = `
+            <div class="placar-titulo">🇭🇺 FLUMINENSE</div>
+            <div class="placar-status sem-jogo">⚠️ Erro ao carregar</div>
+            <div class="placar-info">Tente novamente</div>
+        `;
+        return;
+    }
     
     if (dados.temJogo && dados.aoVivo) {
         container.innerHTML = `
@@ -289,8 +304,14 @@ function atualizarPlacarFluminense(dados) {
     }
 }
 
-function carregarPlacares() {
-    const fluminense = buscarJogoFluminense();
+async function carregarPlacares() {
+    const container = document.getElementById('placarFluminense');
+    container.innerHTML = `
+        <div class="placar-titulo">🇭🇺 FLUMINENSE</div>
+        <div class="loading">⏳ Buscando dados reais da API...</div>
+    `;
+    
+    const fluminense = await buscarJogoFluminenseReal();
     atualizarPlacarFluminense(fluminense);
 }
 
@@ -310,9 +331,8 @@ document.getElementById('becBtn').addEventListener('click', function(e) {
 
 // Carrega os dados
 carregarPlacares();
-setInterval(carregarPlacares, 60000);
+setInterval(carregarPlacares, 30000);
 
-// Service worker
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('../sw.js');
 }
