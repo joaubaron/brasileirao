@@ -193,61 +193,88 @@ async function _fetchAPI(endpoint) {
     'https://corsproxy.io/?url=' + encodeURIComponent(url),
     'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
   ];
-  for (const proxy of proxies) {
+  for (const p of proxies) {
     try {
-      const r = await fetch(proxy, {headers:{'X-Auth-Token':_TOKEN}});
+      const r = await fetch(p, {headers:{'X-Auth-Token':_TOKEN}});
       if (r.ok) return await r.json();
     } catch(e) {}
   }
   return null;
 }
 
-async function _placar(teamId, elId, fallback) {
-  const el = document.getElementById(elId);
-  const live = await _fetchAPI('/matches?status=LIVE');
+function _fmtJogo(m, teamId) {
+  const d = new Date(m.utcDate);
+  const h = d.getUTCHours()-3; const ha = h<0?h+24:h;
+  const min = d.getUTCMinutes().toString().padStart(2,'0');
+  return '📅 ' + d.getUTCDate()+'/'+(d.getUTCMonth()+1)+' '+ha+'h'+min+'\n'+m.homeTeam.shortName+' × '+m.awayTeam.shortName;
+}
+
+async function _placarFlu() {
+  const el = document.getElementById('placar-flu');
+  // Busca jogos ao vivo no Brasileirão (BSA = código da Série A)
+  const live = await _fetchAPI('/competitions/BSA/matches?status=LIVE');
   if (live && live.matches) {
-    const m = live.matches.find(x => x.homeTeam?.id===teamId || x.awayTeam?.id===teamId);
+    const m = live.matches.find(x => x.homeTeam?.id===1773 || x.awayTeam?.id===1773);
     if (m) {
       const home = m.score?.fullTime?.home ?? m.score?.halfTime?.home ?? 0;
       const away = m.score?.fullTime?.away ?? m.score?.halfTime?.away ?? 0;
-      el.textContent = '🔴 AO VIVO
-' + m.homeTeam.shortName + ' ' + home + 'x' + away + ' ' + m.awayTeam.shortName;
+      el.textContent = '🔴 AO VIVO\n'+m.homeTeam.shortName+' '+home+'x'+away+' '+m.awayTeam.shortName;
       return;
     }
   }
-  // Próximo agendado (SCHEDULED ou TIMED)
-  for (const status of ['SCHEDULED', 'TIMED']) {
-    const nxt = await _fetchAPI('/teams/' + teamId + '/matches?status=' + status + '&limit=5');
-    if (nxt && nxt.matches && nxt.matches.length) {
-      const fut = nxt.matches.filter(x => new Date(x.utcDate) > new Date()).sort((a,b)=>new Date(a.utcDate)-new Date(b.utcDate));
-      if (fut.length) {
-        const m = fut[0];
-        const d = new Date(m.utcDate);
-        const h = d.getUTCHours()-3; const ha = h<0?h+24:h;
-        const min = d.getUTCMinutes().toString().padStart(2,'0');
-        el.textContent = '📅 ' + d.getUTCDate()+'/'+(d.getUTCMonth()+1)+' '+ha+'h'+min+'\n'+m.homeTeam.shortName+' × '+m.awayTeam.shortName;
+  // Próximo jogo no Brasileirão
+  const nxt = await _fetchAPI('/competitions/BSA/matches?status=SCHEDULED&limit=50');
+  if (nxt && nxt.matches) {
+    const now = new Date();
+    const fut = nxt.matches.filter(x =>
+      (x.homeTeam?.id===1773 || x.awayTeam?.id===1773) && new Date(x.utcDate) > now
+    ).sort((a,b)=>new Date(a.utcDate)-new Date(b.utcDate));
+    if (fut.length) { el.textContent = _fmtJogo(fut[0]); return; }
+  }
+  // Último resultado
+  const fin = await _fetchAPI('/competitions/BSA/matches?status=FINISHED&limit=50');
+  if (fin && fin.matches) {
+    const past = fin.matches.filter(x => x.homeTeam?.id===1773 || x.awayTeam?.id===1773);
+    if (past.length) {
+      const m = past[past.length-1];
+      const home = m.score?.fullTime?.home ?? 0;
+      const away = m.score?.fullTime?.away ?? 0;
+      el.textContent = '✅ '+m.homeTeam.shortName+' '+home+'x'+away+' '+m.awayTeam.shortName;
+      return;
+    }
+  }
+  el.textContent = '⚽ FLU';
+}
+
+async function _placarBra() {
+  const el = document.getElementById('placar-bra');
+  // Brasil: busca em WC Qualification CONMEBOL (WCQ) e Copa America (CA) e Mundial (WC)
+  for (const comp of ['WCQ', 'CLI', 'WC']) {
+    const live = await _fetchAPI('/competitions/'+comp+'/matches?status=LIVE');
+    if (live && live.matches) {
+      const m = live.matches.find(x => x.homeTeam?.id===764 || x.awayTeam?.id===764);
+      if (m) {
+        const home = m.score?.fullTime?.home ?? m.score?.halfTime?.home ?? 0;
+        const away = m.score?.fullTime?.away ?? m.score?.halfTime?.away ?? 0;
+        el.textContent = '🔴 AO VIVO\n'+m.homeTeam.shortName+' '+home+'x'+away+' '+m.awayTeam.shortName;
         return;
       }
     }
+    const nxt = await _fetchAPI('/competitions/'+comp+'/matches?status=SCHEDULED&limit=50');
+    if (nxt && nxt.matches) {
+      const now = new Date();
+      const fut = nxt.matches.filter(x =>
+        (x.homeTeam?.id===764 || x.awayTeam?.id===764) && new Date(x.utcDate) > now
+      ).sort((a,b)=>new Date(a.utcDate)-new Date(b.utcDate));
+      if (fut.length) { el.textContent = _fmtJogo(fut[0]); return; }
+    }
   }
-  // Último jogo finalizado como fallback
-  const last = await _fetchAPI('/teams/' + teamId + '/matches?status=FINISHED&limit=1');
-  if (last && last.matches && last.matches.length) {
-    const m = last.matches[last.matches.length-1];
-    const home = m.score?.fullTime?.home ?? 0;
-    const away = m.score?.fullTime?.away ?? 0;
-    el.textContent = '✅ ' + m.homeTeam.shortName + ' ' + home + 'x' + away + ' ' + m.awayTeam.shortName;
-    return;
-  }
-  el.textContent = fallback;
+  el.textContent = '🇧🇷 BRA';
 }
 
-_placar(1773, 'placar-flu', '🟢 FLU');
-_placar(764,  'placar-bra', '🇧🇷 BRA');
-setInterval(() => {
-  _placar(1773, 'placar-flu', '🟢 FLU');
-  _placar(764,  'placar-bra', '🇧🇷 BRA');
-}, 30000);
+_placarFlu();
+_placarBra();
+setInterval(() => { _placarFlu(); _placarBra(); }, 30000);
 </script>
 </body>
 </html>
