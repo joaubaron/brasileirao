@@ -2,8 +2,8 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brasileirão</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Fluminense | Jogos ao Vivo</title>
 
 <!-- PWA -->
 <link rel="manifest" href="./manifest.json">
@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Brasileirão">
+<meta name="apple-mobile-web-app-title" content="Fluminense">
 
 <!-- Ícones -->
 <link rel="apple-touch-icon" href="../icon-192.png">
@@ -20,205 +20,466 @@
 <link rel="icon" type="image/png" sizes="400x400" href="../bola.png">
 
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
 body {
-background: #1a1f45;
-font-family: 'Roboto', sans-serif;
-min-height: 100vh;
-display: flex;
-align-items: center;
-justify-content: center;
-overflow: hidden;       /* ← adicionar */
-touch-action: none;     /* ← adicionar */
+    background: #1a1f45;
+    font-family: 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    touch-action: none;
+    padding: 16px;
 }
 
 .card {
-text-align: center;
-padding: 0.1rem 2rem 2rem 2rem;
+    text-align: center;
+    padding: 0.1rem 1.5rem 2rem 1.5rem;
+    max-width: 500px;
+    width: 100%;
+    background: rgba(255,255,255,0.02);
+    border-radius: 48px;
+    backdrop-filter: blur(2px);
 }
 
 .logo {
-width: 300px;
-height: 300px;
-margin-bottom: 0.5rem;
-border-radius: 24px;
+    width: 280px;
+    height: 280px;
+    margin-bottom: 0.5rem;
+    border-radius: 32px;
+    object-fit: contain;
+    background: rgba(255,255,255,0.05);
 }
 
 h1 {
-color: white;
-font-size: 1.2rem;
-margin-bottom: 0.5rem;
+    color: white;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
 }
 
 .card p {
-color: rgba(255,255,255,0.7);
-margin-bottom: 1rem;
-}
-
-p {
-color: rgba(255,255,255,0.7);
-margin-bottom: 2rem;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
 }
 
 .btn {
-display: inline-block;
-background: #ffffff;
-color: #1a1f45;
-text-decoration: none;
-padding: 8px 20px;
-border-radius: 12px;
-font-weight: bold;
-font-size: 0.85rem;
-transition: transform 0.2s;
-cursor: pointer;
--webkit-tap-highlight-color: transparent;
-user-select: none;
--webkit-user-select: none;
+    display: inline-block;
+    background: #ffffff;
+    color: #1a1f45;
+    text-decoration: none;
+    padding: 10px 24px;
+    border-radius: 40px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 .btn:active {
-transform: scale(0.96);
+    transform: scale(0.96);
+    background: #f0f0f0;
 }
 
-/* NOVAS CLASSES PARA OS LOGOS LADO A LADO */
+/* SEÇÃO DE JOGOS DO FLUMINENSE */
+.jogos-container {
+    background: rgba(0,0,0,0.4);
+    border-radius: 28px;
+    padding: 1rem;
+    margin: 1rem 0 1.2rem 0;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.15);
+}
+
+.status-live {
+    display: inline-block;
+    background: #e53935;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 4px 12px;
+    border-radius: 40px;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.7; transform: scale(0.98);}
+    50% { opacity: 1; transform: scale(1);}
+    100% { opacity: 0.7; transform: scale(0.98);}
+}
+
+.placar-card {
+    font-size: 2rem;
+    font-weight: 800;
+    color: white;
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.time-nome {
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    background: rgba(0,0,0,0.5);
+    padding: 4px 12px;
+    border-radius: 40px;
+    display: inline-block;
+}
+
+.detalhes-jogo {
+    color: rgba(255,255,255,0.9);
+    font-size: 0.8rem;
+    margin-top: 8px;
+    font-weight: 500;
+}
+
+.proximo-titulo {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #ffde7a;
+    margin-top: 8px;
+}
+
+.proximo-jogo {
+    background: rgba(255,255,255,0.1);
+    border-radius: 28px;
+    padding: 12px;
+    margin-top: 12px;
+}
+
+.sem-jogo {
+    color: rgba(255,255,255,0.7);
+    font-weight: 500;
+    padding: 12px;
+}
+
 .logos-container {
-display: flex;
-gap: 20px;
-justify-content: center;
-align-items: flex-start;
-margin-top: 2rem;
-}
-
-.time-wrapper {
-display: flex;
-flex-direction: column;
-align-items: center;
-gap: 6px;
-}
-
-.placar {
-font-size: 0.65rem;
-color: rgba(255,255,255,0.85);
-background: rgba(255,255,255,0.1);
-border-radius: 8px;
-padding: 3px 7px;
-min-width: 64px;
-text-align: center;
-line-height: 1.3;
-white-space: pre-line;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1.8rem;
 }
 
 .time-logo {
-width: 70px;
-height: 70px;
-cursor: pointer;
-border-radius: 12px;
--webkit-tap-highlight-color: transparent;
-user-select: none;
--webkit-user-select: none;
-}
-
-#brasilBtn {
-width: 80px;
-height: 78px;
-position: relative;
-bottom: 2px;
+    width: 70px;
+    height: 70px;
+    cursor: pointer;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.1);
+    padding: 8px;
+    transition: transform 0.1s ease;
+    object-fit: contain;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .time-logo:active {
+    transform: scale(0.94);
 }
-/* FIM DAS NOVAS CLASSES */
 
+#brasilBtn {
+    width: 80px;
+    height: 78px;
+    position: relative;
+    bottom: 1px;
+}
+
+.flu-destaque {
+    border: 2px solid #9b59b6;
+}
 </style>
 </head>
 <body>
 <div class="card">
-<img src="../bola.png" alt="Brasileirão" class="logo">
-<br><br>
-<p style="color: white; font-size: 14px; font-weight: 500;">Campeonatos, jogos e resultados</p>
-<a href="#" class="btn" id="verBtn">Ver Classificação ⚽</a>
-<br><br>
+    <img src="../bola.png" alt="Fluminense" class="logo">
+    <br>
+    <p style="color: white; font-size: 14px; font-weight: 500;">Campeonatos, jogos e resultados</p>
+    <a href="#" class="btn" id="verBtn">Ver Classificação ⚽</a>
 
-<!-- MUDANÇA AQUI: TRÊS LOGOS LADO A LADO -->
-<div class="logos-container">
-<div class="time-wrapper">
-  <img src="meutime.png" alt="meutime" class="time-logo" id="meutimeBtn">
-  <div class="placar" id="placar-flu">⏳</div>
-</div>
-<div class="time-wrapper">
-  <img src="../brasil.png" alt="Brasil" class="time-logo" id="brasilBtn">
-  <div class="placar" id="placar-bra">⏳</div>
-</div>
+    <!-- ÁREA EXCLUSIVA FLUMINENSE -->
+    <div class="jogos-container" id="liveGameContainer">
+        <div style="text-align: center;" id="liveContent">
+            <div style="color:white; padding:12px;">⚽ Buscando jogos do Fluminense...</div>
+        </div>
+    </div>
 
-</div>
-<!-- FIM DA MUDANÇA -->
+    <!-- ÁREA SELEÇÃO BRASILEIRA -->
+    <div class="jogos-container" id="liveGameContainerBra" style="margin-top:0.5rem;">
+        <div style="text-align: center;" id="liveContentBra">
+            <div style="color:white; padding:12px;">🇧🇷 Buscando jogos do Brasil...</div>
+        </div>
+    </div>
 
+    <!-- LOGOS DOS TIMES -->
+    <div class="logos-container">
+        <img src="meutime.png" alt="Fluminense" class="time-logo flu-destaque" id="meutimeBtn">
+        <img src="../brasil.png" alt="Brasil" class="time-logo" id="brasilBtn">
+    </div>
 </div>
 
 <script>
+// ========== CONFIGURAÇÃO FOOTBALL-DATA ==========
+const API_TOKEN = '097a10c756d8414bab6f4d152de93b41';
+const BASE_URL = 'https://api.football-data.org/v4';
+
+// IDs dos times (Football-Data.org)
+const FLUMINENSE_ID = 1773;
+
+// Headers da API
+const headers = { 'X-Auth-Token': API_TOKEN };
+
+// Helper para fetch com tratamento de erro (via proxy CORS)
+const PROXY = 'https://corsproxy.io/?url=';
+
+async function fetchAPI(endpoint) {
+    const url = encodeURIComponent(`${BASE_URL}${endpoint}`);
+    try {
+        const response = await fetch(`${PROXY}${url}`, {
+            headers: { 'X-Auth-Token': API_TOKEN }
+        });
+        if (!response.ok) {
+            console.warn(`API error ${response.status} para ${endpoint}`);
+            return null;
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Fetch error:', error);
+        return null;
+    }
+}
+
+// Função principal: busca jogos SOMENTE do Fluminense
+async function buscarJogosFluminense() {
+    const container = document.getElementById('liveContent');
+    if (!container) return;
+    
+    container.innerHTML = '<div style="color:white; padding:12px;">⏳ Carregando jogos do Fluminense...</div>';
+    
+    // 1. Buscar partidas AO VIVO onde Fluminense esteja envolvido
+    //    Podemos buscar matches com status LIVE em todas competições e filtrar pelo ID do Fluminense
+    let liveMatchFlu = null;
+    try {
+        const liveData = await fetchAPI('/matches?status=LIVE');
+        if (liveData && liveData.matches) {
+            liveMatchFlu = liveData.matches.find(match => 
+                match.homeTeam?.id === FLUMINENSE_ID || match.awayTeam?.id === FLUMINENSE_ID
+            );
+        }
+    } catch(e) { console.warn(e); }
+    
+    // Se tem jogo AO VIVO do Fluminense
+    if (liveMatchFlu) {
+        const isHome = liveMatchFlu.homeTeam?.id === FLUMINENSE_ID;
+        const adversario = isHome ? liveMatchFlu.awayTeam?.name : liveMatchFlu.homeTeam?.name;
+        const golsFlu = isHome 
+            ? (liveMatchFlu.score?.fullTime?.home ?? liveMatchFlu.score?.halfTime?.home ?? 0)
+            : (liveMatchFlu.score?.fullTime?.away ?? liveMatchFlu.score?.halfTime?.away ?? 0);
+        const golsAdv = isHome 
+            ? (liveMatchFlu.score?.fullTime?.away ?? liveMatchFlu.score?.halfTime?.away ?? 0)
+            : (liveMatchFlu.score?.fullTime?.home ?? liveMatchFlu.score?.halfTime?.home ?? 0);
+        const minuto = liveMatchFlu.minute || '0';
+        const tempo = liveMatchFlu.stage || '1º Tempo';
+        
+        container.innerHTML = `
+            <div class="status-live">🔴 AO VIVO - FLUMINENSE</div>
+            <div class="placar-card">
+                <span style="font-weight:800;">FLUMINENSE</span>
+                <span style="font-size:2.4rem; background:#1a1f45; padding:0 12px; border-radius:20px;">${golsFlu} × ${golsAdv}</span>
+                <span>${adversario?.split(' ').slice(0,2).join(' ') || 'Adversário'}</span>
+            </div>
+            <div class="detalhes-jogo">
+                ⏱️ ${minuto}' - ${tempo}
+            </div>
+        `;
+        return;
+    }
+    
+    // 2. NÃO TEM JOGO AO VIVO: buscar PRÓXIMA PARTIDA do Fluminense
+    let nextMatch = null;
+    try {
+        // método 1: buscar partidas agendadas do time
+        const scheduleData = await fetchAPI(`/teams/${FLUMINENSE_ID}/matches?status=SCHEDULED&limit=10`);
+        if (scheduleData && scheduleData.matches) {
+            const now = new Date();
+            const futureMatches = scheduleData.matches.filter(m => new Date(m.utcDate) > now);
+            if (futureMatches.length > 0) {
+                nextMatch = futureMatches.sort((a,b) => new Date(a.utcDate) - new Date(b.utcDate))[0];
+            }
+        }
+        
+        // fallback: buscar na competição Brasileirão Série A (2013)
+        if (!nextMatch) {
+            const serieAData = await fetchAPI('/competitions/2013/matches?status=SCHEDULED&limit=30');
+            if (serieAData && serieAData.matches) {
+                const now = new Date();
+                const fluMatches = serieAData.matches.filter(m => 
+                    (m.homeTeam?.id === FLUMINENSE_ID || m.awayTeam?.id === FLUMINENSE_ID) && new Date(m.utcDate) > now
+                );
+                if (fluMatches.length > 0) {
+                    nextMatch = fluMatches.sort((a,b) => new Date(a.utcDate) - new Date(b.utcDate))[0];
+                }
+            }
+        }
+    } catch(e) { console.warn(e); }
+    
+    // Se encontrou próximo jogo
+    if (nextMatch) {
+        const isHome = nextMatch.homeTeam?.id === FLUMINENSE_ID;
+        const adversario = isHome ? nextMatch.awayTeam?.name : nextMatch.homeTeam?.name;
+        const dataUTC = new Date(nextMatch.utcDate);
+        
+        // Formatação da data: Sábado, 16h
+        const diasSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+        const diaSemana = diasSemana[dataUTC.getUTCDay()];
+        const horas = dataUTC.getUTCHours() - 3; // Ajuste UTC-3 (horário de Brasília)
+        const horaAjustada = horas < 0 ? horas + 24 : horas;
+        const minutos = dataUTC.getUTCMinutes().toString().padStart(2,'0');
+        const horaStr = `${horaAjustada}h${minutos}`;
+        const diaMes = dataUTC.getUTCDate();
+        const mes = dataUTC.getUTCMonth() + 1;
+        
+        container.innerHTML = `
+            <div>
+                <div class="proximo-titulo">⚽ Nenhum jogo ao vivo agora</div>
+                <div class="proximo-jogo">
+                    <div style="font-weight:bold; color:white; font-size:1.2rem; margin-bottom:6px;">
+                        🟢 Próximo: Fluminense × ${adversario?.split(' ').slice(0,2).join(' ') || 'Adversário'}
+                    </div>
+                    <div style="color:#ffde7a;">
+                        ${diaSemana} • ${diaMes}/${mes} • ${horaStr} • Maracanã
+                    </div>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    // Caso sem jogos encontrados
+    container.innerHTML = `
+    <div class="sem-jogo" style="font-size:0.93rem;">
+        ⚽ Fluminense não joga ao vivo<br>
+        Próximas partidas em breve
+    </div>
+`;
+}
+
+// ========== SELEÇÃO BRASILEIRA ==========
+const BRASIL_ID = 764;
+
+async function buscarJogosBrasil() {
+    const container = document.getElementById('liveContentBra');
+    if (!container) return;
+
+    let liveMatch = null;
+    try {
+        const liveData = await fetchAPI('/matches?status=LIVE');
+        if (liveData && liveData.matches) {
+            liveMatch = liveData.matches.find(m =>
+                m.homeTeam?.id === BRASIL_ID || m.awayTeam?.id === BRASIL_ID
+            );
+        }
+    } catch(e) {}
+
+    if (liveMatch) {
+        const isHome = liveMatch.homeTeam?.id === BRASIL_ID;
+        const adv = isHome ? liveMatch.awayTeam?.name : liveMatch.homeTeam?.name;
+        const golsBra = isHome
+            ? (liveMatch.score?.fullTime?.home ?? liveMatch.score?.halfTime?.home ?? 0)
+            : (liveMatch.score?.fullTime?.away ?? liveMatch.score?.halfTime?.away ?? 0);
+        const golsAdv = isHome
+            ? (liveMatch.score?.fullTime?.away ?? liveMatch.score?.halfTime?.away ?? 0)
+            : (liveMatch.score?.fullTime?.home ?? liveMatch.score?.halfTime?.home ?? 0);
+        container.innerHTML = `
+            <div class="status-live">🔴 AO VIVO - BRASIL</div>
+            <div class="placar-card">
+                <span style="font-weight:800;">BRASIL</span>
+                <span style="font-size:2.4rem; background:#1a1f45; padding:0 12px; border-radius:20px;">${golsBra} × ${golsAdv}</span>
+                <span>${adv?.split(' ').slice(0,2).join(' ') || 'Adversário'}</span>
+            </div>
+            <div class="detalhes-jogo">⏱️ ${liveMatch.minute || '0'}'</div>`;
+        return;
+    }
+
+    let next = null;
+    try {
+        const data = await fetchAPI(`/teams/${BRASIL_ID}/matches?status=SCHEDULED&limit=10`);
+        if (data && data.matches) {
+            const now = new Date();
+            const fut = data.matches.filter(m => new Date(m.utcDate) > now);
+            if (fut.length) next = fut.sort((a,b) => new Date(a.utcDate) - new Date(b.utcDate))[0];
+        }
+    } catch(e) {}
+
+    if (next) {
+        const isHome = next.homeTeam?.id === BRASIL_ID;
+        const adv = isHome ? next.awayTeam?.name : next.homeTeam?.name;
+        const d = new Date(next.utcDate);
+        const dias = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+        const h = d.getUTCHours() - 3; const ha = h < 0 ? h+24 : h;
+        const min = d.getUTCMinutes().toString().padStart(2,'0');
+        container.innerHTML = `
+            <div class="proximo-titulo">🇧🇷 Próximo jogo do Brasil</div>
+            <div class="proximo-jogo">
+                <div style="font-weight:bold; color:white; font-size:1.1rem; margin-bottom:6px;">
+                    Brasil × ${adv?.split(' ').slice(0,2).join(' ') || 'Adversário'}
+                </div>
+                <div style="color:#ffde7a;">
+                    ${dias[d.getUTCDay()]} • ${d.getUTCDate()}/${d.getUTCMonth()+1} • ${ha}h${min}
+                </div>
+            </div>`;
+        return;
+    }
+
+    container.innerHTML = `<div class="sem-jogo">🇧🇷 Nenhum jogo agendado para o Brasil</div>`;
+}
+
+// ========== NAVEGAÇÃO E REDIRECIONAMENTOS ==========
 const googleUrl = "https://www.espn.com.br/futebol/classificacao";
 const meutimeUrl = "https://www.fluminense.com.br/site/";
 
 document.getElementById('verBtn').addEventListener('click', function(e) {
-window.location.href = googleUrl;
+    e.preventDefault();
+    window.location.href = googleUrl;
 });
 document.getElementById('meutimeBtn').addEventListener('click', function(e) {
-window.location.href = meutimeUrl;
+    window.location.href = meutimeUrl;
 });
 document.getElementById('brasilBtn').addEventListener('click', function(e) {
-window.location.href = "https://www.cbf.com.br/";
+    window.location.href = "https://www.cbf.com.br/";
 });
-// ── Placares ao vivo / próximo jogo ──
-const API_TOKEN = "097a10c756d8414bab6f4d152de93b41";
-const API_BASE  = "https://api.football-data.org/v4";
-
-function fmtDate(iso) {
-  const d = new Date(iso);
-  return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'})
-       + '\n' + d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
-}
-
-async function fetchTeamStatus(teamId, elId) {
-  const el = document.getElementById(elId);
-  try {
-    // Tenta jogo ao vivo primeiro
-    const liveRes = await fetch(`${API_BASE}/teams/${teamId}/matches?status=IN_PLAY,PAUSED,HALFTIME&limit=1`, {headers:{'X-Auth-Token':API_TOKEN}});
-    const liveData = await liveRes.json();
-    if (liveData.matches && liveData.matches.length > 0) {
-      const m = liveData.matches[0];
-      const hs = m.score.fullTime.home ?? m.score.halfTime.home ?? '-';
-      const as = m.score.fullTime.away ?? m.score.halfTime.away ?? '-';
-      el.textContent = `🔴 AO VIVO\n${m.homeTeam.shortName} ${hs}×${as} ${m.awayTeam.shortName}`;
-      return;
-    }
-    // Próximo jogo agendado
-    const nxtRes = await fetch(`${API_BASE}/teams/${teamId}/matches?status=SCHEDULED,TIMED&limit=1`, {headers:{'X-Auth-Token':API_TOKEN}});
-    const nxtData = await nxtRes.json();
-    if (nxtData.matches && nxtData.matches.length > 0) {
-      const m = nxtData.matches[0];
-      el.textContent = `📅 ${fmtDate(m.utcDate)}\n${m.homeTeam.shortName} × ${m.awayTeam.shortName}`;
-      return;
-    }
-    el.textContent = '—';
-  } catch(e) {
-    el.textContent = '—';
-  }
-}
-
-// Fluminense ID: 1966 | Brasil (seleção) ID: 764
-fetchTeamStatus(1966, 'placar-flu');
-fetchTeamStatus(764,  'placar-bra');
 
 // Bloqueia scroll por toque
 document.addEventListener('touchmove', function(e) {
-e.preventDefault();
+    e.preventDefault();
 }, { passive: false });
 
-// Service worker
-if ('serviceWorker' in navigator) {
-navigator.serviceWorker.register('../sw.js');
-}
+// Inicializar e atualizar a cada 30 segundos
+buscarJogosFluminense();
+buscarJogosBrasil();
+setInterval(() => {
+    buscarJogosFluminense();
+    buscarJogosBrasil();
+}, 30000);
+
+
 </script>
 </body>
 </html>
