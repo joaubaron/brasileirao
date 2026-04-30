@@ -86,8 +86,27 @@ transform: scale(0.96);
 display: flex;
 gap: 20px;
 justify-content: center;
-align-items: center;
+align-items: flex-start;
 margin-top: 2rem;
+}
+
+.time-wrapper {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 6px;
+}
+
+.placar {
+font-size: 0.65rem;
+color: rgba(255,255,255,0.85);
+background: rgba(255,255,255,0.1);
+border-radius: 8px;
+padding: 3px 7px;
+min-width: 64px;
+text-align: center;
+line-height: 1.3;
+white-space: pre-line;
 }
 
 .time-logo {
@@ -123,9 +142,15 @@ bottom: 2px;
 
 <!-- MUDANÇA AQUI: TRÊS LOGOS LADO A LADO -->
 <div class="logos-container">
-<img src="meutime.png" alt="meutime" class="time-logo" id="meutimeBtn">
-<img src="../brasil.png" alt="Brasil" class="time-logo" id="brasilBtn">
-<img src="../bec.png" alt="BEC" class="time-logo" id="becBtn">
+<div class="time-wrapper">
+  <img src="meutime.png" alt="meutime" class="time-logo" id="meutimeBtn">
+  <div class="placar" id="placar-flu">⏳</div>
+</div>
+<div class="time-wrapper">
+  <img src="../brasil.png" alt="Brasil" class="time-logo" id="brasilBtn">
+  <div class="placar" id="placar-bra">⏳</div>
+</div>
+
 </div>
 <!-- FIM DA MUDANÇA -->
 
@@ -144,9 +169,46 @@ window.location.href = meutimeUrl;
 document.getElementById('brasilBtn').addEventListener('click', function(e) {
 window.location.href = "https://www.cbf.com.br/";
 });
-document.getElementById('becBtn').addEventListener('click', function(e) {
-window.location.href = "https://www.becsaf.com.br/";
-});
+// ── Placares ao vivo / próximo jogo ──
+const API_TOKEN = "097a10c756d8414bab6f4d152de93b41";
+const API_BASE  = "https://api.football-data.org/v4";
+
+function fmtDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'})
+       + '\n' + d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+}
+
+async function fetchTeamStatus(teamId, elId) {
+  const el = document.getElementById(elId);
+  try {
+    // Tenta jogo ao vivo primeiro
+    const liveRes = await fetch(`${API_BASE}/teams/${teamId}/matches?status=IN_PLAY,PAUSED,HALFTIME&limit=1`, {headers:{'X-Auth-Token':API_TOKEN}});
+    const liveData = await liveRes.json();
+    if (liveData.matches && liveData.matches.length > 0) {
+      const m = liveData.matches[0];
+      const hs = m.score.fullTime.home ?? m.score.halfTime.home ?? '-';
+      const as = m.score.fullTime.away ?? m.score.halfTime.away ?? '-';
+      el.textContent = `🔴 AO VIVO\n${m.homeTeam.shortName} ${hs}×${as} ${m.awayTeam.shortName}`;
+      return;
+    }
+    // Próximo jogo agendado
+    const nxtRes = await fetch(`${API_BASE}/teams/${teamId}/matches?status=SCHEDULED,TIMED&limit=1`, {headers:{'X-Auth-Token':API_TOKEN}});
+    const nxtData = await nxtRes.json();
+    if (nxtData.matches && nxtData.matches.length > 0) {
+      const m = nxtData.matches[0];
+      el.textContent = `📅 ${fmtDate(m.utcDate)}\n${m.homeTeam.shortName} × ${m.awayTeam.shortName}`;
+      return;
+    }
+    el.textContent = '—';
+  } catch(e) {
+    el.textContent = '—';
+  }
+}
+
+// Fluminense ID: 1966 | Brasil (seleção) ID: 764
+fetchTeamStatus(1966, 'placar-flu');
+fetchTeamStatus(764,  'placar-bra');
 
 // Bloqueia scroll por toque
 document.addEventListener('touchmove', function(e) {
