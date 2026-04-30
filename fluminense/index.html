@@ -262,6 +262,30 @@ async function buscarJogoFluminenseReal() {
       };
     }
 
+    // Nenhum jogo futuro — mostra último resultado
+    if (data.ultimo) {
+      const u = data.ultimo;
+      const ehMandante = ehFluminense(u.homeTeam?.name);
+      const adversario = ehMandante ? u.awayTeam?.name : u.homeTeam?.name;
+      const golsFlu = ehMandante ? u.score?.fullTime?.home : u.score?.fullTime?.away;
+      const golsAdv = ehMandante ? u.score?.fullTime?.away : u.score?.fullTime?.home;
+      const d = new Date(u.utcDate);
+      const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+
+      return {
+        temJogo: true,
+        aoVivo: false,
+        encerrado: true,
+        proximo: ehMandante
+          ? `Fluminense ${golsFlu} x ${golsAdv} ${adversario}`
+          : `${adversario} ${golsAdv} x ${golsFlu} Fluminense`,
+        data: `Encerrado • ${d.getDate()} de ${meses[d.getMonth()]}`,
+        dataCompleta: "Último resultado",
+        local: u.venue || "",
+        competicao: u.competition?.name || "",
+      };
+    }
+
     return { temJogo: false };
   } catch (error) {
     console.error("Erro:", error);
@@ -291,10 +315,14 @@ function atualizarPlacarFluminense(dados) {
             <div class="placar-info" style="font-size:0.65rem">🏆 ${dados.competicao}</div>
         `;
     } else if (dados.temJogo && !dados.aoVivo) {
+        const icone = dados.encerrado ? "🏁" : "🗓️";
+        const corStatus = dados.encerrado ? "#aaaaaa" : "#ffaa44";
+        const labelStatus = dados.encerrado ? "Jogo encerrado" : "⚽ Nenhum jogo ao vivo";
+
         container.innerHTML = `
-            <div class="placar-titulo">FLUMINENSE</div>
-            <div class="placar-status sem-jogo">⚽ Nenhum jogo ao vivo</div>
-            <div class="placar-info" style="font-weight:bold">Próximo: ${dados.proximo}</div>
+            <div class="placar-titulo">🇭🇺 FLUMINENSE</div>
+            <div class="placar-status sem-jogo" style="color:${corStatus}">${labelStatus}</div>
+            <div class="placar-info" style="font-weight:bold">${icone} ${dados.proximo}</div>
             <div class="placar-info">${dados.dataCompleta}</div>
             <div class="proximo-jogo">${dados.data} • ${dados.local}</div>
             <div class="placar-info" style="font-size:0.65rem;margin-top:4px">🏆 ${dados.competicao}</div>
