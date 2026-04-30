@@ -308,15 +308,19 @@ function atualizarPlacarFluminense(dados) {
     }
 }
 
+let primeiraVez = true;
+
 async function carregarPlacares() {
+  if (primeiraVez) {
     const container = document.getElementById('placarFluminense');
     container.innerHTML = `
-        <div class="placar-titulo">🇭🇺 FLUMINENSE</div>
-        <div class="loading">⏳ Buscando dados reais da API...</div>
+      <div class="placar-titulo">🇭🇺 FLUMINENSE</div>
+      <div class="loading">⏳ Buscando dados...</div>
     `;
-    
-    const fluminense = await buscarJogoFluminenseReal();
-    atualizarPlacarFluminense(fluminense);
+  }
+  const fluminense = await buscarJogoFluminenseReal();
+  atualizarPlacarFluminense(fluminense);
+  primeiraVez = false;
 }
 
 // Eventos dos botões
