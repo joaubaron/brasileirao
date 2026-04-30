@@ -185,24 +185,28 @@ navigator.serviceWorker.register('../sw.js');
 // ── Placares Fluminense e Brasil ──
 const _TOKEN = '097a10c756d8414bab6f4d152de93b41';
 const _BASE  = 'https://api.football-data.org/v4';
-const _PROXY = 'https://corsproxy.io/?url=';
 
 async function _fetchAPI(endpoint) {
   const url = _BASE + endpoint;
+  // Tenta múltiplos proxies
   const proxies = [
-    'https://corsproxy.io/?url=' + encodeURIComponent(url),
     'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+    'https://thingproxy.freeboard.io/fetch/' + url,
+    'https://proxy.cors.sh/' + url,
   ];
   for (const p of proxies) {
     try {
-      const r = await fetch(p, {headers:{'X-Auth-Token':_TOKEN}});
-      if (r.ok) return await r.json();
+      const r = await fetch(p, {headers:{'X-Auth-Token':_TOKEN, 'x-requested-with':'XMLHttpRequest'}});
+      if (r.ok) {
+        const data = await r.json();
+        if (data && !data.error) return data;
+      }
     } catch(e) {}
   }
   return null;
 }
 
-function _fmtJogo(m, teamId) {
+function _fmtJogo(m) {
   const d = new Date(m.utcDate);
   const h = d.getUTCHours()-3; const ha = h<0?h+24:h;
   const min = d.getUTCMinutes().toString().padStart(2,'0');
@@ -211,35 +215,21 @@ function _fmtJogo(m, teamId) {
 
 async function _placarFlu() {
   const el = document.getElementById('placar-flu');
-  // Busca jogos ao vivo no Brasileirão (BSA = código da Série A)
-  const live = await _fetchAPI('/competitions/BSA/matches?status=LIVE');
-  if (live && live.matches) {
-    const m = live.matches.find(x => x.homeTeam?.id===1773 || x.awayTeam?.id===1773);
-    if (m) {
-      const home = m.score?.fullTime?.home ?? m.score?.halfTime?.home ?? 0;
-      const away = m.score?.fullTime?.away ?? m.score?.halfTime?.away ?? 0;
-      el.textContent = '🔴 AO VIVO\n'+m.homeTeam.shortName+' '+home+'x'+away+' '+m.awayTeam.shortName;
-      return;
-    }
-  }
-  // Próximo jogo no Brasileirão
-  const nxt = await _fetchAPI('/competitions/BSA/matches?status=SCHEDULED&limit=50');
-  if (nxt && nxt.matches) {
+  const data = await _fetchAPI('/competitions/BSA/matches?status=SCHEDULED&limit=50');
+  if (data && data.matches) {
     const now = new Date();
-    const fut = nxt.matches.filter(x =>
-      (x.homeTeam?.id===1773 || x.awayTeam?.id===1773) && new Date(x.utcDate) > now
-    ).sort((a,b)=>new Date(a.utcDate)-new Date(b.utcDate));
+    const fut = data.matches
+      .filter(x => (x.homeTeam?.id===1773 || x.awayTeam?.id===1773) && new Date(x.utcDate) > now)
+      .sort((a,b) => new Date(a.utcDate)-new Date(b.utcDate));
     if (fut.length) { el.textContent = _fmtJogo(fut[0]); return; }
   }
-  // Último resultado
+  // fallback: último resultado
   const fin = await _fetchAPI('/competitions/BSA/matches?status=FINISHED&limit=50');
   if (fin && fin.matches) {
     const past = fin.matches.filter(x => x.homeTeam?.id===1773 || x.awayTeam?.id===1773);
     if (past.length) {
       const m = past[past.length-1];
-      const home = m.score?.fullTime?.home ?? 0;
-      const away = m.score?.fullTime?.away ?? 0;
-      el.textContent = '✅ '+m.homeTeam.shortName+' '+home+'x'+away+' '+m.awayTeam.shortName;
+      el.textContent = '✅ '+m.homeTeam.shortName+' '+(m.score?.fullTime?.home??0)+'x'+(m.score?.fullTime?.away??0)+' '+m.awayTeam.shortName;
       return;
     }
   }
@@ -248,43 +238,23 @@ async function _placarFlu() {
 
 async function _placarBra() {
   const el = document.getElementById('placar-bra');
-  // Brasil: busca em WC Qualification CONMEBOL (WCQ) e Copa America (CA) e Mundial (WC)
-  for (const comp of ['WCQ', 'CLI', 'WC']) {
-    const live = await _fetchAPI('/competitions/'+comp+'/matches?status=LIVE');
-    if (live && live.matches) {
-      const m = live.matches.find(x => x.homeTeam?.id===764 || x.awayTeam?.id===764);
-      if (m) {
-        const home = m.score?.fullTime?.home ?? m.score?.halfTime?.home ?? 0;
-        const away = m.score?.fullTime?.away ?? m.score?.halfTime?.away ?? 0;
-        el.textContent = '🔴 AO VIVO\n'+m.homeTeam.shortName+' '+home+'x'+away+' '+m.awayTeam.shortName;
-        return;
-      }
-    }
-    const nxt = await _fetchAPI('/competitions/'+comp+'/matches?status=SCHEDULED&limit=50');
-    if (nxt && nxt.matches) {
+  // Eliminatórias CONMEBOL código = CONMEBOL_WC
+  for (const comp of ['WCQ','CONMEBOL','WC','CA']) {
+    const data = await _fetchAPI('/competitions/'+comp+'/matches?status=SCHEDULED&limit=50');
+    if (data && data.matches) {
       const now = new Date();
-      const fut = nxt.matches.filter(x =>
-        (x.homeTeam?.id===764 || x.awayTeam?.id===764) && new Date(x.utcDate) > now
-      ).sort((a,b)=>new Date(a.utcDate)-new Date(b.utcDate));
+      const fut = data.matches
+        .filter(x => (x.homeTeam?.id===764 || x.awayTeam?.id===764) && new Date(x.utcDate) > now)
+        .sort((a,b) => new Date(a.utcDate)-new Date(b.utcDate));
       if (fut.length) { el.textContent = _fmtJogo(fut[0]); return; }
     }
   }
   el.textContent = '🇧🇷 BRA';
 }
 
-async function _debug() {
-  const el = document.getElementById('placar-flu');
-  el.textContent = '🔄 testando proxy...';
-  try {
-    const url = 'https://api.football-data.org/v4/competitions/BSA/matches?status=SCHEDULED&limit=3';
-    const r = await fetch('https://corsproxy.io/?url=' + encodeURIComponent(url), {headers:{'X-Auth-Token':_TOKEN}});
-    const txt = await r.text();
-    el.textContent = 'HTTP ' + r.status + '\n' + txt.substring(0,80);
-  } catch(e) {
-    el.textContent = '❌ ' + e.message;
-  }
-}
-_debug();
+_placarFlu();
+_placarBra();
+setInterval(() => { _placarFlu(); _placarBra(); }, 30000);
 </script>
 </body>
 </html>
