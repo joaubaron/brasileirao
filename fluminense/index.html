@@ -330,7 +330,7 @@ function atualizarPlacarFluminense(dados) {
     if (dados.temJogo && dados.aoVivo) {
         container.innerHTML = `
            <div class="placar-titulo">FLUMINENSE</div>
-           <div class="placar-status ao-vivo">🔴 AO VIVO</div>
+           <div class="placar-status ao-vivo">🟢 AO VIVO</div>
            <div class="placar-jogo">${dados.mandante} ${dados.golsMandante} x ${dados.golsVisitante} ${dados.visitante}</div>
            <div class="placar-info">${dados.tempo}</div>
            <div class="placar-info" style="font-size:0.65rem">🏆 ${dados.competicao}</div>`;
