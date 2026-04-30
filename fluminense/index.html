@@ -111,39 +111,13 @@ bottom: 2px;
 }
 /* FIM DAS NOVAS CLASSES */
 
-
-.placares-linha {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  margin-top: 14px;
-}
-.placar-badge {
-  flex: 1;
-  max-width: 140px;
-  font-size: 0.7rem;
-  color: rgba(255,255,255,0.9);
-  background: rgba(255,255,255,0.1);
-  border-radius: 10px;
-  padding: 6px 10px;
-  text-align: center;
-  white-space: pre-line;
-  line-height: 1.4;
-  min-height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 </style>
 </head>
 <body>
 <div class="card">
 <img src="../bola.png" alt="Brasileirão" class="logo">
 <br><br>
-<p style="color: white; font-size: 14px; font-weight: 500;">Campeonatos, jogos e resultados</p>
-<a href="#" class="btn" id="verBtn">Ver Classificação ⚽</a>
-<br><br>
-
+<p style="color: white; font-size: 14px; font-weight: 500; cursor:pointer;" id="verBtn">⚽ Campeonatos, jogos e resultados</p>
 <!-- MUDANÇA AQUI: TRÊS LOGOS LADO A LADO -->
 <div class="logos-container">
 <img src="meutime.png" alt="meutime" class="time-logo" id="meutimeBtn">
@@ -151,12 +125,6 @@ bottom: 2px;
 <img src="../bec.png" alt="BEC" class="time-logo" id="becBtn">
 </div>
 <!-- FIM DA MUDANÇA -->
-<!-- PLACARES -->
-<div class="placares-linha">
-  <div class="placar-badge" id="placar-flu">⏳ Fluminense</div>
-  <div class="placar-badge" id="placar-bra">⏳ Brasil</div>
-</div>
-
 
 </div>
 
@@ -186,52 +154,6 @@ e.preventDefault();
 if ('serviceWorker' in navigator) {
 navigator.serviceWorker.register('../sw.js');
 }
-
-// ── Placares Fluminense e Brasil ──
-const _TOKEN = '097a10c756d8414bab6f4d152de93b41';
-const _BASE  = 'https://api.football-data.org/v4';
-const _PROXY = 'https://corsproxy.io/?url=';
-
-async function _fetchAPI(endpoint) {
-  try {
-    const r = await fetch(_PROXY + encodeURIComponent(_BASE + endpoint), {headers:{'X-Auth-Token':_TOKEN}});
-    return r.ok ? await r.json() : null;
-  } catch(e) { return null; }
-}
-
-async function _placar(teamId, elId, fallback) {
-  const el = document.getElementById(elId);
-  const live = await _fetchAPI('/matches?status=LIVE');
-  if (live && live.matches) {
-    const m = live.matches.find(x => x.homeTeam?.id===teamId || x.awayTeam?.id===teamId);
-    if (m) {
-      const home = m.score?.fullTime?.home ?? m.score?.halfTime?.home ?? 0;
-      const away = m.score?.fullTime?.away ?? m.score?.halfTime?.away ?? 0;
-      el.textContent = '🔴 AO VIVO\n' + m.homeTeam.shortName + ' ' + home + 'x' + away + ' ' + m.awayTeam.shortName;
-      return;
-    }
-  }
-  const nxt = await _fetchAPI('/teams/' + teamId + '/matches?status=SCHEDULED&limit=5');
-  if (nxt && nxt.matches) {
-    const fut = nxt.matches.filter(x => new Date(x.utcDate) > new Date()).sort((a,b)=>new Date(a.utcDate)-new Date(b.utcDate));
-    if (fut.length) {
-      const m = fut[0];
-      const d = new Date(m.utcDate);
-      const h = d.getUTCHours()-3; const ha = h<0?h+24:h;
-      const min = d.getUTCMinutes().toString().padStart(2,'0');
-      el.textContent = '📅 ' + d.getUTCDate()+'/'+(d.getUTCMonth()+1)+' '+ha+'h'+min+'\n'+m.homeTeam.shortName+' × '+m.awayTeam.shortName;
-      return;
-    }
-  }
-  el.textContent = fallback;
-}
-
-_placar(1773, 'placar-flu', '🟢 FLU');
-_placar(764,  'placar-bra', '🇧🇷 BRA');
-setInterval(() => {
-  _placar(1773, 'placar-flu', '🟢 FLU');
-  _placar(764,  'placar-bra', '🇧🇷 BRA');
-}, 30000);
 </script>
 </body>
 </html>
