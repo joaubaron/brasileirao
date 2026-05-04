@@ -7,7 +7,9 @@
 
 <!-- PWA -->
 <link rel="manifest" href="./manifest.json">
+<link rel="preconnect" href="https://www.espn.com.br">
 <meta name="theme-color" content="#1a1f45">
+<meta name="description" content="Acompanhe jogos, resultados e próximas partidas do Fluminense no Brasileirão. Atualizações em tempo real.">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -227,13 +229,13 @@ display: none;
 </div>
 
 <div class="card">
-<img src="../bola.png" alt="Brasileirão" class="logo">
+<img src="../bola.png" alt="Logo do Brasileirão com uma bola de futebol" class="logo">
 <a href="#" class="btn" id="verBtn">Campeonatos, jogos e resultados ⚽</a>
 <br>
 <div class="logos-container">
-<img src="meutime.png" alt="meutime" class="time-logo" id="meutimeBtn">
-<img src="../brasil.png" alt="Brasil" class="time-logo" id="brasilBtn">
-<img src="../bec.png" alt="BEC" class="time-logo" id="becBtn">
+<img src="meutime.png" alt="Site oficial do Fluminense" class="time-logo" id="meutimeBtn" aria-label="Acessar site do Fluminense">
+<img src="../brasil.png" alt="Site oficial da CBF" class="time-logo" id="brasilBtn" aria-label="Acessar site da CBF">
+<img src="../bec.png" alt="Site oficial do BEC" class="time-logo" id="becBtn" aria-label="Acessar site do BEC">
 </div>
 
 <div class="placar-central">
@@ -337,7 +339,6 @@ competicao: u.competition?.name || "",
 
 return { temJogo: false };
 } catch (error) {
-console.error("Erro:", error);
 return { temJogo: false, erro: true };
 }
 }
