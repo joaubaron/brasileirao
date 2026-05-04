@@ -292,41 +292,48 @@ async function buscarJogoFluminenseReal() {
       .sort((a, b) => a.dataObj - b.dataObj)[0];
 
     if (proximo) {
-      const d = proximo.dataObj;
-      const dias = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
-      const meses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-      const hora = `${d.getHours().toString().padStart(2,"0")}:${d.getMinutes().toString().padStart(2,"0")}`;
-      const ehMandante = ehFluminense(proximo.homeTeam?.name);
-      const adversario = ehMandante ? proximo.awayTeam?.name : proximo.homeTeam?.name;
-      return {
-        temJogo: true, aoVivo: false,
-        proximo: ehMandante ? `Fluminense x ${adversario}` : `${adversario} x Fluminense`,
-        data: `${dias[d.getDay()]} • ${hora}`,
-        dataCompleta: `${d.getDate()} de ${meses[d.getMonth()]}`,
-        local: proximo.venue || "Estádio",
-        competicao: proximo.competition?.name || "",
-      };
-    }
+  const d = proximo.dataObj;
+  const dias = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+  const meses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+  const hora = `${d.getHours().toString().padStart(2,"0")}:${d.getMinutes().toString().padStart(2,"0")}`;
+  const ehMandante = ehFluminense(proximo.homeTeam?.name);
+  const adversario = ehMandante ? proximo.awayTeam?.name : proximo.homeTeam?.name;
+  
+  // NOVA LINHA: data e hora juntas
+  const dataHora = `${d.getDate()} de ${meses[d.getMonth()]} • ${dias[d.getDay()]} • ${hora}`;
+  
+  return {
+    temJogo: true, aoVivo: false,
+    proximo: ehMandante ? `Fluminense x ${adversario}` : `${adversario} x Fluminense`,
+    dataHora: dataHora,  // ← novo campo
+    // local: proximo.venue || "Estádio",  // ← REMOVA esta linha
+    competicao: proximo.competition?.name || "",
+  };
+}
 
     if (data.ultimo) {
-      const u = data.ultimo;
-      const ehMandante = ehFluminense(u.homeTeam?.name);
-      const adversario = ehMandante ? u.awayTeam?.name : u.homeTeam?.name;
-      const golsFlu = ehMandante ? u.score?.fullTime?.home : u.score?.fullTime?.away;
-      const golsAdv = ehMandante ? u.score?.fullTime?.away : u.score?.fullTime?.home;
-      const d = new Date(u.utcDate);
-      const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
-      return {
-        temJogo: true, aoVivo: false, encerrado: true,
-        proximo: ehMandante
-          ? `Fluminense ${golsFlu} x ${golsAdv} ${adversario}`
-          : `${adversario} ${golsAdv} x ${golsFlu} Fluminense`,
-        data: `Encerrado • ${d.getDate()} de ${meses[d.getMonth()]}`,
-        dataCompleta: "Último resultado",
-        local: u.venue || "",
-        competicao: u.competition?.name || "",
-      };
-    }
+  const u = data.ultimo;
+  const ehMandante = ehFluminense(u.homeTeam?.name);
+  const adversario = ehMandante ? u.awayTeam?.name : u.homeTeam?.name;
+  const golsFlu = ehMandante ? u.score?.fullTime?.home : u.score?.fullTime?.away;
+  const golsAdv = ehMandante ? u.score?.fullTime?.away : u.score?.fullTime?.home;
+  const d = new Date(u.utcDate);
+  const dias = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+  const meses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+  const hora = `${d.getHours().toString().padStart(2,"0")}:${d.getMinutes().toString().padStart(2,"0")}`;
+  
+  // Data formatada igual ao próximo jogo
+  const dataHora = `${d.getDate()} de ${meses[d.getMonth()]} • ${dias[d.getDay()]} • ${hora}`;
+  
+  return {
+    temJogo: true, aoVivo: false, encerrado: true,
+    proximo: ehMandante
+      ? `Fluminense ${golsFlu} x ${golsAdv} ${adversario}`
+      : `${adversario} ${golsAdv} x ${golsFlu} Fluminense`,
+    dataHora: dataHora,  // ← novo campo igual ao próximo jogo
+    competicao: u.competition?.name || "",
+  };
+}
 
     return { temJogo: false };
   } catch (error) {
@@ -387,28 +394,27 @@ function atualizarPlacarFluminense(dados) {
                 <span class="placar-x">x</span>
                 <span>${visitanteDisplay}</span>
             </div>
-            <div class="placar-info">${dados.data}</div>
+            <div class="placar-info">${dados.dataHora}</div>
             <div class="placar-info" style="font-size:0.65rem">🏆 ${dados.competicao}</div>`;
     }
-    // Caso 3: PRÓXIMO JOGO (já funciona, mas mantemos consistência)
-    else if (dados.temJogo && !dados.aoVivo && !dados.encerrado) {
-        const partes = dados.proximo.split(' x ');
-        const linhaJogo = partes.length === 2
-            ? `<div class="placar-times">
-                   <span>${partes[0]}</span>
-                   <span class="placar-x">x</span>
-                   <span>${partes[1]}</span>
-               </div>`
-            : `<div class="placar-info" style="font-weight:bold">${dados.proximo}</div>`;
-            
-        container.innerHTML = `
-            <div class="placar-titulo">FLUMINENSE</div>
-            <div class="placar-status sem-jogo" style="color:#ffaa44">⚽ Nenhum jogo ao vivo</div>
-            ${linhaJogo}
-            <div class="placar-info">${dados.dataCompleta}</div>
-            <div class="proximo-jogo">${dados.data} • ${dados.local}</div>
-            <div class="placar-info" style="font-size:0.65rem;margin-top:4px">🏆 ${dados.competicao}</div>`;
-    }
+  // Caso 3: PRÓXIMO JOGO
+else if (dados.temJogo && !dados.aoVivo && !dados.encerrado) {
+    const partes = dados.proximo.split(' x ');
+    const linhaJogo = partes.length === 2
+        ? `<div class="placar-times">
+               <span>${partes[0]}</span>
+               <span class="placar-x">x</span>
+               <span>${partes[1]}</span>
+           </div>`
+        : `<div class="placar-info" style="font-weight:bold">${dados.proximo}</div>`;
+        
+    container.innerHTML = `
+        <div class="placar-titulo">FLUMINENSE</div>
+        <div class="placar-status sem-jogo" style="color:#ffaa44">⚽ Nenhum jogo ao vivo</div>
+        ${linhaJogo}
+        <div class="placar-info">${dados.dataHora}</div>
+        <div class="placar-info" style="font-size:0.65rem;margin-top:4px">🏆 ${dados.competicao}</div>`;
+}
     // Caso 4: SEM JOGO PROGRAMADO
     else {
         container.innerHTML = `
