@@ -335,13 +335,12 @@ function atualizarPlacarFluminense(dados) {
            <div class="placar-info">${dados.tempo}</div>
            <div class="placar-info" style="font-size:0.65rem">🏆 ${dados.competicao}</div>`;
     } else if (dados.temJogo && !dados.aoVivo) {
-        const icone = dados.encerrado ? "🏁" : "🗓️";
         const corStatus = dados.encerrado ? "#aaaaaa" : "#ffaa44";
         const labelStatus = dados.encerrado ? "Jogo encerrado" : "⚽ Nenhum jogo ao vivo";
         container.innerHTML = `
             <div class="placar-titulo">FLUMINENSE</div>
             <div class="placar-status sem-jogo" style="color:${corStatus}">${labelStatus}</div>
-            <div class="placar-info" style="font-weight:bold">${icone} ${dados.proximo}</div>
+            <div class="placar-info" style="font-weight:bold">${dados.proximo}</div>
             <div class="placar-info">${dados.dataCompleta}</div>
             <div class="proximo-jogo">${dados.data} • ${dados.local}</div>
             <div class="placar-info" style="font-size:0.65rem;margin-top:4px">🏆 ${dados.competicao}</div>`;
@@ -354,6 +353,7 @@ function atualizarPlacarFluminense(dados) {
 }
 
 let primeiraVez = true;
+let ultimoEncerrado = null;       // { dados, expiresAt }
 
 async function carregarPlacares() {
   if (primeiraVez) {
@@ -362,7 +362,20 @@ async function carregarPlacares() {
       <div class="placar-titulo">FLUMINENSE</div>
       <div class="loading">⏳ Buscando dados...</div>`;
   }
-  const fluminense = await buscarJogoFluminenseReal();
+  let fluminense = await buscarJogoFluminenseReal();
+
+  // Se veio jogo encerrado, guarda com expiração de 30 min
+  if (fluminense.temJogo && fluminense.encerrado) {
+    ultimoEncerrado = { dados: fluminense, expiresAt: Date.now() + 30 * 60 * 1000 };
+  }
+
+  // Se não tem jogo ao vivo/agendado mas ainda está no prazo, mostra o encerrado
+  if (!fluminense.temJogo && ultimoEncerrado && Date.now() < ultimoEncerrado.expiresAt) {
+    fluminense = ultimoEncerrado.dados;
+  } else if (ultimoEncerrado && Date.now() >= ultimoEncerrado.expiresAt) {
+    ultimoEncerrado = null;
+  }
+
   atualizarPlacarFluminense(fluminense);
   primeiraVez = false;
 }
