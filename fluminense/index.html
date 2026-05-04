@@ -104,7 +104,7 @@ width: 100%;
 background: transparent;
 border-radius: 16px;
 padding: 12px;
-width: 100%;
+width: 80%;
 max-width: 280px;
 text-align: center;
 border: 1px solid rgba(255,255,255,0.3);
@@ -376,13 +376,10 @@ function atualizarPlacarFluminense(dados) {
     }
     // Caso 2: JOGO ENCERRADO
     else if (dados.temJogo && dados.encerrado) {
-        // Extrair times e gols do formato "Fluminense 2 x 1 Palmeiras"
         const partes = dados.proximo.split(' x ');
         let mandanteDisplay = partes[0];
         let visitanteDisplay = partes[1];
-        
-        // Se veio no formato "Palmeiras 1 x 2 Fluminense"
-        // Garantir que exibimos como duas linhas
+              
         container.innerHTML = `
             <div class="placar-titulo">FLUMINENSE</div>
             <div class="placar-status sem-jogo" style="color:#aaaaaa">✅ ENCERRADO</div>
