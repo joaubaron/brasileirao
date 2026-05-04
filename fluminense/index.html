@@ -422,25 +422,28 @@ async function buscarJogoFluminenseReal() {
             .sort((a, b) => a.dataObj - b.dataObj)[0];
 
         if (proximo) {
-            const d = proximo.dataObj;
-            const meses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-            const dataHora = `${d.getDate()} de ${meses[d.getMonth()]} • ${d.toLocaleDateString('pt-BR', { weekday: 'long' })} • ${d.getHours().toString().padStart(2,"0")}:${d.getMinutes().toString().padStart(2,"0")}`;
-            
-            const ehMandante = ehFluminense(proximo.homeTeam?.name);
-            const adversario = ehMandante ? proximo.awayTeam?.name : proximo.homeTeam?.name;
-            
-            const confrontoFormatado = formatarPlacarSiglas(
-                ehMandante ? "Fluminense" : adversario,
-                ehMandante ? adversario : "Fluminense"
-            );
-            
-            return {
-                temJogo: true, aoVivo: false,
-                confrontoFormatado: confrontoFormatado,
-                dataHora: dataHora,
-                competicao: proximo.competition?.name || "",
-            };
-        }
+    const d = proximo.dataObj;
+    const meses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+    const dataHora = `${d.getDate()} de ${meses[d.getMonth()]} • ${d.toLocaleDateString('pt-BR', { weekday: 'long' })} • ${d.getHours().toString().padStart(2,"0")}:${d.getMinutes().toString().padStart(2,"0")}`;
+    
+    const ehMandante = ehFluminense(proximo.homeTeam?.name);
+    const adversario = ehMandante ? proximo.awayTeam?.name : proximo.homeTeam?.name;
+    
+    const confrontoFormatado = formatarPlacarSiglas(
+        ehMandante ? "Fluminense" : adversario,
+        ehMandante ? adversario : "Fluminense"
+    );
+    
+    const nomesCompletos = `${proximo.homeTeam?.name} x ${proximo.awayTeam?.name}`;  // ← LINHA NOVA
+    
+    return {
+        temJogo: true, aoVivo: false,
+        confrontoFormatado: confrontoFormatado,
+        nomesCompletos: nomesCompletos,  // ← CAMPO NOVO
+        dataHora: dataHora,
+        competicao: proximo.competition?.name || "",
+    };
+}
 
         if (data.ultimo) {
             const u = data.ultimo;
@@ -499,14 +502,15 @@ function atualizarPlacarFluminense(dados) {
             <div class="placar-info">${dados.dataHora}</div>
             <div class="placar-info" style="font-size:0.65rem">🏆 ${dados.competicao}</div>`;
     } 
-    else if (dados.temJogo && !dados.aoVivo && !dados.encerrado) {
-        container.innerHTML = `
-            <div class="placar-titulo">FLUMINENSE</div>
-            <div class="placar-status sem-jogo" style="color:#4caf50">⚽ PRÓXIMO JOGO</div>
-            <div class="placar-info" style="font-size:1.1rem; font-weight:bold; margin:8px 0">${dados.confrontoFormatado}</div>
-            <div class="placar-info">${dados.dataHora}</div>
-            <div class="placar-info" style="font-size:0.65rem; margin-top:4px">🏆 ${dados.competicao}</div>`;
-    } 
+   else if (dados.temJogo && !dados.aoVivo && !dados.encerrado) {
+    container.innerHTML = `
+        <div class="placar-titulo">FLUMINENSE</div>
+        <div class="placar-status sem-jogo" style="color:#4caf50">⚽ PRÓXIMO JOGO</div>
+        <div class="placar-info" style="font-size:1.1rem; font-weight:bold; margin:8px 0">${dados.confrontoFormatado}</div>
+        <div class="placar-info" style="font-size:0.7rem; margin-bottom:4px">${dados.nomesCompletos}</div>
+        <div class="placar-info">${dados.dataHora}</div>
+        <div class="placar-info" style="font-size:0.65rem; margin-top:4px">🏆 ${dados.competicao}</div>`;
+}
     else {
         container.innerHTML = `
             <div class="placar-titulo">FLUMINENSE</div>
