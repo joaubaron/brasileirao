@@ -356,7 +356,7 @@ function atualizarPlacarFluminense(dados) {
         const corStatus = dados.encerrado ? "#aaaaaa" : "#ffaa44";
         const labelStatus = dados.encerrado ? "Jogo encerrado" : "⚽ Nenhum jogo ao vivo";
 
-        const partes = dados.proximo.split(' X ');
+        const partes = dados.proximo.split(' x ');
         const linhaJogo = partes.length === 2
             ? `<div class="placar-times">
                    <span>${partes[0]}</span>
