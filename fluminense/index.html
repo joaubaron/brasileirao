@@ -160,6 +160,24 @@ font-size: 0.7rem;
 padding: 10px;
 }
 
+/* === TIMES EM LINHAS SEPARADAS === */
+.placar-times {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-weight: bold;
+  color: white;
+  font-size: 0.85rem;
+  line-height: 1.3;
+  margin: 6px 0;
+}
+.placar-x {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.6);
+  font-weight: normal;
+}
+
 /* === PULL-TO-REFRESH === */
 #ptr-bar {
   position: fixed;
@@ -337,10 +355,20 @@ function atualizarPlacarFluminense(dados) {
     } else if (dados.temJogo && !dados.aoVivo) {
         const corStatus = dados.encerrado ? "#aaaaaa" : "#ffaa44";
         const labelStatus = dados.encerrado ? "Jogo encerrado" : "⚽ Nenhum jogo ao vivo";
+
+        const partes = dados.proximo.split(' X ');
+        const linhaJogo = partes.length === 2
+            ? `<div class="placar-times">
+                   <span>${partes[0]}</span>
+                   <span class="placar-x">x</span>
+                   <span>${partes[1]}</span>
+               </div>`
+            : `<div class="placar-info" style="font-weight:bold">${dados.proximo}</div>`;
+
         container.innerHTML = `
             <div class="placar-titulo">FLUMINENSE</div>
             <div class="placar-status sem-jogo" style="color:${corStatus}">${labelStatus}</div>
-            <div class="placar-info" style="font-weight:bold">${dados.proximo}</div>
+            ${linhaJogo}
             <div class="placar-info">${dados.dataCompleta}</div>
             <div class="proximo-jogo">${dados.data} • ${dados.local}</div>
             <div class="placar-info" style="font-size:0.65rem;margin-top:4px">🏆 ${dados.competicao}</div>`;
