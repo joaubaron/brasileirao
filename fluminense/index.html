@@ -338,6 +338,7 @@ async function buscarJogoFluminenseReal() {
 function atualizarPlacarFluminense(dados) {
     const container = document.getElementById('placarFluminense');
     if (!container) return;
+    
     if (dados.erro) {
         container.innerHTML = `
            <div class="placar-titulo">FLUMINENSE</div>
@@ -345,17 +346,55 @@ function atualizarPlacarFluminense(dados) {
            <div class="placar-info">Tente novamente</div>`;
         return;
     }
+    
+    // Helper para montar as duas linhas (time / x / time)
+    function formatTwoLines(mandante, visitante, golsM = null, golsV = null) {
+        const mandanteDisplay = golsM !== null ? `${mandante} ${golsM}` : mandante;
+        const visitanteDisplay = golsV !== null ? `${visitante} ${golsV}` : visitante;
+        return `
+            <div class="placar-times">
+                <span>${mandanteDisplay}</span>
+                <span class="placar-x">x</span>
+                <span>${visitanteDisplay}</span>
+            </div>
+        `;
+    }
+    
+    // Caso 1: JOGO AO VIVO
     if (dados.temJogo && dados.aoVivo) {
+        const golsM = dados.golsMandante;
+        const golsV = dados.golsVisitante;
+        const duasLinhas = formatTwoLines(dados.mandante, dados.visitante, golsM, golsV);
+        
         container.innerHTML = `
            <div class="placar-titulo">FLUMINENSE</div>
            <div class="placar-status ao-vivo">🟢 AO VIVO</div>
-           <div class="placar-jogo">${dados.mandante} ${dados.golsMandante} x ${dados.golsVisitante} ${dados.visitante}</div>
+           ${duasLinhas}
            <div class="placar-info">${dados.tempo}</div>
            <div class="placar-info" style="font-size:0.65rem">🏆 ${dados.competicao}</div>`;
-    } else if (dados.temJogo && !dados.aoVivo) {
-        const corStatus = dados.encerrado ? "#aaaaaa" : "#ffaa44";
-        const labelStatus = dados.encerrado ? "Jogo encerrado" : "⚽ Nenhum jogo ao vivo";
-
+    }
+    // Caso 2: JOGO ENCERRADO
+    else if (dados.temJogo && dados.encerrado) {
+        // Extrair times e gols do formato "Fluminense 2 x 1 Palmeiras"
+        const partes = dados.proximo.split(' x ');
+        let mandanteDisplay = partes[0];
+        let visitanteDisplay = partes[1];
+        
+        // Se veio no formato "Palmeiras 1 x 2 Fluminense"
+        // Garantir que exibimos como duas linhas
+        container.innerHTML = `
+            <div class="placar-titulo">FLUMINENSE</div>
+            <div class="placar-status sem-jogo" style="color:#aaaaaa">✅ ENCERRADO</div>
+            <div class="placar-times">
+                <span>${mandanteDisplay}</span>
+                <span class="placar-x">x</span>
+                <span>${visitanteDisplay}</span>
+            </div>
+            <div class="placar-info">${dados.data}</div>
+            <div class="placar-info" style="font-size:0.65rem">🏆 ${dados.competicao}</div>`;
+    }
+    // Caso 3: PRÓXIMO JOGO (já funciona, mas mantemos consistência)
+    else if (dados.temJogo && !dados.aoVivo && !dados.encerrado) {
         const partes = dados.proximo.split(' x ');
         const linhaJogo = partes.length === 2
             ? `<div class="placar-times">
@@ -364,15 +403,17 @@ function atualizarPlacarFluminense(dados) {
                    <span>${partes[1]}</span>
                </div>`
             : `<div class="placar-info" style="font-weight:bold">${dados.proximo}</div>`;
-
+            
         container.innerHTML = `
             <div class="placar-titulo">FLUMINENSE</div>
-            <div class="placar-status sem-jogo" style="color:${corStatus}">${labelStatus}</div>
+            <div class="placar-status sem-jogo" style="color:#ffaa44">⚽ Nenhum jogo ao vivo</div>
             ${linhaJogo}
             <div class="placar-info">${dados.dataCompleta}</div>
             <div class="proximo-jogo">${dados.data} • ${dados.local}</div>
             <div class="placar-info" style="font-size:0.65rem;margin-top:4px">🏆 ${dados.competicao}</div>`;
-    } else {
+    }
+    // Caso 4: SEM JOGO PROGRAMADO
+    else {
         container.innerHTML = `
             <div class="placar-titulo">FLUMINENSE</div>
             <div class="placar-status sem-jogo">⚽ Nenhum jogo programado</div>
