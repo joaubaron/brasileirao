@@ -251,7 +251,9 @@ display: none;
 <!-- 🔴 FIX: SVG inline substitui imagem de CDN externo (flaticon) que pode falhar -->
 <svg id="instagramBtn" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24"
   fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-  style="cursor:pointer; border-radius:5px;" aria-label="Instagram do Fluminense">
+  style="cursor:pointer; border-radius:5px; transition:transform 0.2s; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none;"
+  onpointerdown="this.style.transform='scale(0.96)'" onpointerup="this.style.transform=''" onpointerleave="this.style.transform=''"
+  aria-label="Instagram do Fluminense">
   <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
   <circle cx="12" cy="12" r="4"/>
   <circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/>
