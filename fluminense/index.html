@@ -8,6 +8,8 @@
 <!-- PWA -->
 <link rel="manifest" href="./manifest.json">
 <link rel="preconnect" href="https://www.espn.com.br">
+<!-- 🔴 FIX: preconnect ao Worker para reduzir latência no carregamento -->
+<link rel="preconnect" href="https://rapid-pine-1fe3.jabaron.workers.dev">
 <meta name="theme-color" content="#1a1f45">
 <meta name="description" content="Acompanhe jogos, resultados e próximas partidas do Fluminense no Brasileirão. Atualizações em tempo real.">
 <meta name="mobile-web-app-capable" content="yes">
@@ -246,7 +248,14 @@ display: none;
 </div>
 
 <div style="display: flex; justify-content: center; margin-top: 2rem;">
-<img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram do Fluminense" style="width: 30px; height: 30px; cursor: pointer; border-radius: 5px;" id="instagramBtn">
+<!-- 🔴 FIX: SVG inline substitui imagem de CDN externo (flaticon) que pode falhar -->
+<svg id="instagramBtn" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24"
+  fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+  style="cursor:pointer; border-radius:5px;" aria-label="Instagram do Fluminense">
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <circle cx="12" cy="12" r="4"/>
+  <circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/>
+</svg>
 </div>
 
 </div>
@@ -410,13 +419,13 @@ golsCasa,
 golsFora
 );
 
-const nomesCompletos = `${jogoAoVivo.homeTeam?.name} x ${jogoAoVivo.awayTeam?.name}`;  // ← LINHA NOVA
+const nomesCompletos = `${jogoAoVivo.homeTeam?.name} x ${jogoAoVivo.awayTeam?.name}`;
 
 return {
 temJogo: true, aoVivo: true,
 placarFormatado: placarFormatado,
-nomesCompletos: nomesCompletos,  // ← CAMPO NOVO
-tempo, 
+nomesCompletos: nomesCompletos,
+tempo,
 competicao: jogoAoVivo.competition?.name || "",
 };
 }
@@ -441,17 +450,18 @@ ehMandante ? "Fluminense" : adversario,
 ehMandante ? adversario : "Fluminense"
 );
 
-const nomesCompletos = `${proximo.homeTeam?.name} x ${proximo.awayTeam?.name}`;  // ← LINHA NOVA
+const nomesCompletos = `${proximo.homeTeam?.name} x ${proximo.awayTeam?.name}`;
 
 return {
 temJogo: true, aoVivo: false,
 confrontoFormatado: confrontoFormatado,
-nomesCompletos: nomesCompletos,  // ← CAMPO NOVO
+nomesCompletos: nomesCompletos,
 dataHora: dataHora,
 competicao: proximo.competition?.name || "",
 };
 }
 
+// 🔴 FIX: data.ultimo agora existe porque o Worker retorna o campo
 if (data.ultimo) {
 const u = data.ultimo;
 const ehMandante = ehFluminense(u.homeTeam?.name);
@@ -463,7 +473,7 @@ u.score?.fullTime?.home,
 u.score?.fullTime?.away
 );
 
-const nomesCompletos = `${u.homeTeam?.name} x ${u.awayTeam?.name}`;  // ← LINHA NOVA
+const nomesCompletos = `${u.homeTeam?.name} x ${u.awayTeam?.name}`;
 
 const d = new Date(u.utcDate);
 const meses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
@@ -472,7 +482,7 @@ const dataHora = `${d.getDate()} de ${meses[d.getMonth()]} • ${d.toLocaleDateS
 return {
 temJogo: true, aoVivo: false, encerrado: true,
 confrontoFormatado: confrontoFormatado,
-nomesCompletos: nomesCompletos,  // ← CAMPO NOVO
+nomesCompletos: nomesCompletos,
 dataHora: dataHora,
 competicao: u.competition?.name || "",
 };
@@ -633,10 +643,23 @@ window.location.href = "https://www.instagram.com/fluminensefc/";
 
 // Carrega os dados
 carregarPlacares();
-setInterval(carregarPlacares, 30000);
 
+// 🔴 FIX: pausa atualização quando aba está em segundo plano
+let intervalo = setInterval(carregarPlacares, 30000);
+document.addEventListener('visibilitychange', () => {
+if (document.hidden) {
+clearInterval(intervalo);
+} else {
+carregarPlacares(); // atualiza imediatamente ao voltar
+intervalo = setInterval(carregarPlacares, 30000);
+}
+});
+
+// 🔴 FIX: trata erro de registro do Service Worker
 if ('serviceWorker' in navigator) {
-navigator.serviceWorker.register('../sw.js');
+navigator.serviceWorker.register('../sw.js').catch(err => {
+console.warn('Service Worker não registrado:', err);
+});
 }
 </script>
 </body>
