@@ -509,12 +509,9 @@ function atualizarPlacarFluminense(dados) {
 const container = document.getElementById('placarFluminense');
 if (!container) return;
 
-// IMAGEM DO FLUMINENSE (mesma pasta do index.html)
-const logoFlu = '<img src="fluzao.png" alt="Fluminense" style="height: 20px; width: auto;">';
-
 if (dados.erro) {
 container.innerHTML = `
-<div class="placar-titulo">${logoFlu}</div>
+<div class="placar-titulo">FLUMINENSE</div>
 <div class="placar-status sem-jogo">⚠️ Erro ao carregar</div>
 <div class="placar-info">Tente novamente</div>`;
 return;
@@ -522,7 +519,7 @@ return;
 
 if (dados.temJogo && dados.aoVivo) {
 container.innerHTML = `
-<div class="placar-titulo">${logoFlu}</div>
+<div class="placar-titulo">FLUMINENSE</div>
 <div class="placar-status ao-vivo">🟢 AO VIVO</div>
 <div class="placar-info" style="font-size:1.3rem; font-weight:bold; margin:10px 0">${dados.placarFormatado}</div>
 <div class="placar-info" style="font-size:0.7rem; margin-bottom:4px">${dados.nomesCompletos}</div>
@@ -531,7 +528,7 @@ container.innerHTML = `
 }
 else if (dados.temJogo && dados.encerrado) {
 container.innerHTML = `
-<div class="placar-titulo">${logoFlu}</div>
+<div class="placar-titulo">FLUMINENSE</div>
 <div class="placar-status sem-jogo" style="color:white">✅ ENCERRADO</div>
 <div style="font-size:1.1rem; font-weight:bold; margin:8px 0; color:#ffcd01">${dados.confrontoFormatado}</div>
 <div class="placar-info" style="font-size:0.7rem; margin-bottom:4px">${dados.nomesCompletos}</div>
@@ -540,7 +537,7 @@ container.innerHTML = `
 }
 else if (dados.temJogo && !dados.aoVivo && !dados.encerrado) {
 container.innerHTML = `
-<div class="placar-titulo">${logoFlu}</div>
+<div class="placar-titulo">FLUMINENSE</div>
 <div class="placar-status sem-jogo" style="color:white">⚽ PRÓXIMO JOGO</div>
 <div style="font-size:1.1rem; font-weight:bold; margin:8px 0; color:#ffcd01">${dados.confrontoFormatado}</div>
 <div class="placar-info" style="font-size:0.7rem; margin-bottom:4px">${dados.nomesCompletos}</div>
@@ -549,7 +546,7 @@ container.innerHTML = `
 }
 else {
 container.innerHTML = `
-<div class="placar-titulo">${logoFlu}</div>
+<div class="placar-titulo">FLUMINENSE</div>
 <div class="placar-status sem-jogo">📅 Nenhum jogo programado</div>
 <div class="placar-info">Verifique calendário oficial</div>`;
 }
