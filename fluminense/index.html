@@ -165,7 +165,7 @@ line-height: 1.4;
 }
 
 .proximo-jogo {
-color: white0;
+color: white;
 font-size: 0.7rem;
 margin-top: 6px;
 }
@@ -529,7 +529,7 @@ container.innerHTML = `
 else if (dados.temJogo && dados.encerrado) {
 container.innerHTML = `
 <div class="placar-titulo">FLUMINENSE</div>
-<div class="placar-status sem-jogo" style="color:#aaaaaa">✅ ENCERRADO</div>
+<div class="placar-status sem-jogo" style="color:white">✅ ENCERRADO</div>
 <div class="placar-info" style="font-size:1.1rem; font-weight:bold; margin:8px 0">${dados.confrontoFormatado}</div>
 <div class="placar-info" style="font-size:0.7rem; margin-bottom:4px">${dados.nomesCompletos}</div>
 <div class="placar-info">${dados.dataHora}</div>
@@ -538,7 +538,7 @@ container.innerHTML = `
 else if (dados.temJogo && !dados.aoVivo && !dados.encerrado) {
 container.innerHTML = `
 <div class="placar-titulo">FLUMINENSE</div>
-<div class="placar-status sem-jogo" style="color:#4caf50">⚽ PRÓXIMO JOGO</div>
+<div class="placar-status sem-jogo" style="color:white">⚽ PRÓXIMO JOGO</div>
 <div class="placar-info" style="font-size:1.1rem; font-weight:bold; margin:8px 0">${dados.confrontoFormatado}</div>
 <div class="placar-info" style="font-size:0.7rem; margin-bottom:4px">${dados.nomesCompletos}</div>
 <div class="placar-info">${dados.dataHora}</div>
