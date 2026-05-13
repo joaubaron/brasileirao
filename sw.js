@@ -1,4 +1,4 @@
-const CACHE_VERSION = '13.05.2026-1301';
+const CACHE_VERSION = '13.05.2026-1358';
 const CACHE_NAME = `brasileirao-${CACHE_VERSION}`;
 
 const ASSETS = [
